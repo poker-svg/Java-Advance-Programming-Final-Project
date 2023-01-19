@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.creature.bros</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 17:22:17
+ * @LastEditors: Xu YangXin
+ * @Description: 此类代表玩家人物，是抽象基类，继承自生物类Creature
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\creature\bros\Player.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.creature.bros;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.item.World;
+
+
+public abstract class Player extends Creature{
+    private int playerIndex;
+    private List&lt;String&gt; messages;
+    private List&lt;String&gt; oldMessages;
+
+    /**
+     * @author: Xu YangXin
+     * @param {World} world 生物所处世界
+     * @param {char} glyph 生物的字符形象
+     * @param {Color} color 生物的颜色
+     * @param {int} maxHP 生物的最大血量
+     * @param {int} attack 生物的手刀攻击力
+     * @param {int} defense 生物的护甲值
+     * @param {int} visionRadius 生物的视野
+     * @param {int} moveSpeedInterval 生物的移动间隔
+     * @return {*}
+     * @description: 构造器
+     */
+    public Player (World world, char glyph, Color color, int maxHP,
+                int attack, int defense, int visionRadius, int moveSpeedInterval){
+<span class="fc" id="L57">        super(world, glyph, color, maxHP, attack, defense, visionRadius, moveSpeedInterval);</span>
+<span class="fc" id="L58">        this.oldMessages = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 玩家下标
+     * @description: 读取玩家的下标
+     */    
+    public int playerIndex(){
+<span class="fc" id="L67">        return this.playerIndex;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} playerIndex 玩家下标
+     * @return {*}
+     * @description: 设置玩家的下标
+     */    
+    public void setPlayerIndex(int playerIndex){
+<span class="fc" id="L77">        this.playerIndex = playerIndex;</span>
+<span class="fc" id="L78">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;String&gt;} 玩家的消息序列
+     * @description: 读取玩家的消息序列
+     */    
+    public List&lt;String&gt; messages(){
+<span class="fc" id="L86">        return this.messages;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {List&lt;String&gt;} messages 消息序列
+     * @return {*}
+     * @description: 设置玩家的消息序列
+     */    
+    public void setMessage(List&lt;String&gt; messages){
+<span class="fc" id="L96">        this.messages = messages;</span>
+<span class="fc" id="L97">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;String&gt;} 旧消息序列
+     * @description: 读取玩家的旧消息序列
+     */    
+    public List&lt;String&gt; oldMessages(){
+<span class="fc" id="L105">        return this.oldMessages;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {List&lt;String&gt;} oldMessages 旧消息序列
+     * @return {*}
+     * @description: 设置玩家的旧消息序列
+     */    
+    public void setOldMessage(List&lt;String&gt; oldMessages){
+<span class="nc" id="L115">        this.oldMessages = oldMessages;</span>
+<span class="nc" id="L116">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PauseScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.screen</a> &gt; <span class="el_source">PauseScreen.java</span></div><h1>PauseScreen.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2023-01-06 10:58:50
+ * @LastEditTime: 2023-01-16 15:39:25
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为单机版游戏所使用的暂停界面，不包含客户机-服务器交互
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\screen\PauseScreen.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.screen;
+
+import cn.edu.nju.cs.game.asciiPanel.AsciiPanel;
+import cn.edu.nju.cs.game.world.item.World;
+import cn.edu.nju.cs.game.world.item.WorldBuilder;
+import cn.edu.nju.cs.logger.Recorder;
+
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.Color;
+import java.util.Random;
+
+import org.javatuples.Pair;
+
+public class PauseScreen extends RestartScreen {
+<span class="fc" id="L44">    private int stage = 0; // 某个分支功能的进度</span>
+<span class="fc" id="L45">    private int branchIndex = 0;// 分支功能的下标</span>
+    private List&lt;Pair&lt;String,Color&gt;&gt; branches; // 功能分支
+    private PlayScreen playScreen;
+    private World world;
+    private WorldBuilder worldBuilder;
+    private boolean confirmSaveMap;
+    private boolean confirmRestartGame;
+    private boolean confirmSnapShot;
+    private boolean confirmRecord;
+
+    /**
+     * @author: Xu YangXin
+     * @param {PlayScreen} playScreen 游戏界面
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L61">    public PauseScreen(PlayScreen playScreen){</span>
+<span class="fc" id="L62">        this.playScreen = playScreen;</span>
+<span class="fc" id="L63">        this.world = playScreen.world();</span>
+<span class="fc" id="L64">        this.worldBuilder = playScreen.worldBuilder();</span>
+<span class="fc" id="L65">        this.branchIndex = 0;</span>
+<span class="fc" id="L66">        this.stage = 0;</span>
+<span class="fc" id="L67">        this.branches = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L68">        Random random = new Random();</span>
+
+<span class="fc" id="L70">        this.branches.add(Pair.with(&quot;Save Map&quot;,</span>
+<span class="fc" id="L71">                        new Color(random.nextInt(255),</span>
+<span class="fc" id="L72">                                random.nextInt(255),</span>
+<span class="fc" id="L73">                                random.nextInt(255))));</span>
+<span class="fc" id="L74">        this.branches.add(Pair.with(&quot;Restart Game&quot;,</span>
+<span class="fc" id="L75">                        new Color(random.nextInt(255),</span>
+<span class="fc" id="L76">                                random.nextInt(255),</span>
+<span class="fc" id="L77">                                random.nextInt(255))));</span>
+<span class="fc" id="L78">        this.branches.add(Pair.with(&quot;Snap Shot&quot;,</span>
+<span class="fc" id="L79">                        new Color(random.nextInt(255),</span>
+<span class="fc" id="L80">                                random.nextInt(255),</span>
+<span class="fc" id="L81">                                random.nextInt(255))));</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if(this.playScreen.recordFlag()){</span>
+<span class="nc" id="L83">            this.branches.add(Pair.with(&quot;End Record&quot;,</span>
+<span class="nc" id="L84">                            new Color(random.nextInt(255),</span>
+<span class="nc" id="L85">                                    random.nextInt(255),</span>
+<span class="nc" id="L86">                                    random.nextInt(255))));</span>
+        }
+        else{
+<span class="fc" id="L89">            this.branches.add(Pair.with(&quot;Start Record&quot;,</span>
+<span class="fc" id="L90">                            new Color(random.nextInt(255),</span>
+<span class="fc" id="L91">                                    random.nextInt(255),</span>
+<span class="fc" id="L92">                                    random.nextInt(255))));</span>
+        }
+<span class="fc" id="L94">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 要输出的目标终端
+     * @return {*}
+     * @description: 将当前的内容显示到屏幕上
+     */    
+    public void displayOutput(AsciiPanel terminal) {
+<span class="fc" id="L104">        terminal.clear();</span>
+<span class="pc bpc" id="L105" title="1 of 3 branches missed.">        switch (this.stage) {</span>
+            case 0:
+<span class="fc bfc" id="L107" title="All 2 branches covered.">                for(int i = 0; i &lt; this.branches.size(); i++){</span>
+<span class="fc" id="L108">                    String brachName = branches.get(i).getValue0();</span>
+<span class="fc" id="L109">                    Color color = branches.get(i).getValue1();</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">                    if(i == branchIndex)</span>
+<span class="fc" id="L111">                        terminal.write(padRight(brachName, 29, ' '), 35, 24 + i*2, color, AsciiPanel.brown);</span>
+                    else
+<span class="fc" id="L113">                        terminal.write(padRight(brachName, 29, ' '), 35, 24 + i*2, color);</span>
+                }
+<span class="fc" id="L115">                break;</span>
+            case 1:
+<span class="fc" id="L117">                displayStage_1(terminal);</span>
+<span class="fc" id="L118">                break;</span>
+            default:
+                break;
+        }
+<span class="fc" id="L122">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 用户按下的按键
+     * @return {Screen}
+     * @description: 响应用户按下的按键操作
+     */    
+    public Screen respondToUserInput(KeyEvent key) {
+<span class="pc bpc" id="L132" title="1 of 3 branches missed.">        switch (this.stage)</span>
+        {
+            case 0: // 选择分支功能
+<span class="fc" id="L135">                return selectBranches(key);</span>
+            case 1: // 确认
+<span class="pc bpc" id="L137" title="1 of 5 branches missed.">                switch (this.branchIndex)</span>
+                {
+                    case 0: // 保存地图的第二阶段 —— 确认
+<span class="fc" id="L140">                        return saveMap(key);</span>
+                    case 1: // 重新开始游戏的第二阶段 —— 确认
+<span class="fc" id="L142">                        return restartGame(key);</span>
+                    case 2: // 快照的第二阶段 —— 确认
+<span class="fc" id="L144">                        return snapShot(key);</span>
+                    case 3: // 录制的第三阶段 —— 确认
+<span class="fc" id="L146">                        return record(key);</span>
+                    default:
+<span class="nc" id="L148">                        return this;</span>
+                }
+            default:
+<span class="nc" id="L151">                return this;</span>
+        }
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} src 原始字符串
+     * @param {int} len 目标字符串长度
+     * @param {char} ch 用于对齐时填充的字符
+     * @return {String} 对齐后的字符串
+     * @description: 将原始的字符串进行右侧对齐
+     */
+    public static String padRight(String src, int len, char ch) {
+<span class="fc" id="L164">        int diff = len - src.length();</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if (diff &lt;= 0) {</span>
+<span class="nc" id="L166">            return src;</span>
+        }
+
+<span class="fc" id="L169">        char[] charr = new char[len];</span>
+<span class="fc" id="L170">        System.arraycopy(src.toCharArray(), 0, charr, 0, src.length());</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        for (int i = src.length(); i &lt; len; i++) {</span>
+<span class="fc" id="L172">            charr[i] = ch;</span>
+        }
+<span class="fc" id="L174">        return new String(charr);</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 用户按下的按键
+     * @return {Screen} 更新后的屏幕
+     * @description: 处理用户选择功能分支时的操作
+     */
+    private Screen selectBranches(KeyEvent key){
+        // 开始选择功能
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        if(stage == 0){ // 尚未结束选择，按下enter键结束功能分支选择</span>
+<span class="pc bpc" id="L186" title="2 of 5 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ESCAPE:
+<span class="fc" id="L188">                    world.setWorldPauseFlag(false);</span>
+<span class="fc" id="L189">                    this.playScreen.musicStuff().start();</span>
+<span class="fc" id="L190">                    return this.playScreen;</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc bfc" id="L192" title="All 2 branches covered.">                    if(branchIndex == 0) // 存储地图的功能分支</span>
+<span class="fc" id="L193">                        confirmSaveMap = false;</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">                    else if(branchIndex == 1) // 重新开始游戏的功能分支</span>
+<span class="fc" id="L195">                        confirmRestartGame = false;</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">                    else if(branchIndex == 2) // 快照的功能分支</span>
+<span class="fc" id="L197">                        confirmSnapShot = false;</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">                    else if(branchIndex == 3) // 录制的功能分支</span>
+<span class="fc" id="L199">                        confirmRecord = false;</span>
+<span class="fc" id="L200">                    stage++;    // 进入该功能分支的第二阶段</span>
+<span class="fc" id="L201">                    break;</span>
+                case KeyEvent.VK_UP:
+<span class="nc bnc" id="L203" title="All 2 branches missed.">                    if(branchIndex &gt; 0) branchIndex--;</span>
+                    break;
+                case KeyEvent.VK_DOWN:
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">                    if(branchIndex &lt; this.branches.size()-1) branchIndex++;</span>
+                    break;
+            }
+        }
+<span class="fc" id="L210">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 用户按下的按键
+     * @return {Screen} 更新后的屏幕
+     * @description: 处理用户存储地图时的操作
+     */
+    private Screen saveMap(KeyEvent key){
+<span class="pc bpc" id="L220" title="1 of 2 branches missed.">        if(stage == 1){ // 取消或者确认保存地图</span>
+<span class="pc bpc" id="L221" title="2 of 5 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_LEFT:
+<span class="fc" id="L223">                    confirmSaveMap = true;</span>
+<span class="fc" id="L224">                    break;</span>
+                case KeyEvent.VK_RIGHT:
+<span class="fc" id="L226">                    confirmSaveMap = false;</span>
+<span class="fc" id="L227">                    break;</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc bfc" id="L229" title="All 2 branches covered.">                    if(confirmSaveMap){</span>
+<span class="fc" id="L230">                        this.worldBuilder.storeWorld(this.world);</span>
+<span class="fc" id="L231">                        confirmSaveMap = false;</span>
+                    }
+<span class="fc" id="L233">                    stage--;</span>
+<span class="fc" id="L234">                    break;</span>
+                case KeyEvent.VK_ESCAPE:
+<span class="nc" id="L236">                    stage--;</span>
+<span class="nc" id="L237">                    break;</span>
+                default:
+                    break;
+            }
+        }
+<span class="fc" id="L242">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 用户按下的按键
+     * @return {Screen} 更新后的屏幕
+     * @description: 处理用户重启游戏时的操作
+     */
+    private Screen restartGame(KeyEvent key){
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if(stage == 1){ // 取消或者确认重新开始游戏</span>
+<span class="pc bpc" id="L253" title="2 of 5 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_LEFT:
+<span class="fc" id="L255">                    confirmRestartGame = true;</span>
+<span class="fc" id="L256">                    break;</span>
+                case KeyEvent.VK_RIGHT:
+<span class="fc" id="L258">                    confirmRestartGame = false;</span>
+<span class="fc" id="L259">                    break;</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc bfc" id="L261" title="All 2 branches covered.">                    if(confirmRestartGame)</span>
+<span class="fc" id="L262">                        return new StartScreen();</span>
+<span class="fc" id="L263">                    stage--;</span>
+<span class="fc" id="L264">                    break;</span>
+                case KeyEvent.VK_ESCAPE:
+<span class="nc" id="L266">                    stage--;</span>
+<span class="nc" id="L267">                    break;</span>
+                default:
+                    break;
+            }
+        }
+<span class="fc" id="L272">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 用户按下的按键
+     * @return {Screen} 更新后的屏幕
+     * @description: 处理用户暂存游戏进度的操作
+     */
+    private Screen snapShot(KeyEvent key){
+<span class="pc bpc" id="L282" title="1 of 2 branches missed.">        if(stage == 1){ // 取消或者确认快照</span>
+<span class="pc bpc" id="L283" title="2 of 5 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_LEFT:
+<span class="fc" id="L285">                    confirmSnapShot = true;</span>
+<span class="fc" id="L286">                    break;</span>
+                case KeyEvent.VK_RIGHT:
+<span class="fc" id="L288">                    confirmSnapShot = false;</span>
+<span class="fc" id="L289">                    break;</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc bfc" id="L291" title="All 2 branches covered.">                    if(confirmSnapShot){</span>
+                        try {
+<span class="fc" id="L293">                            Recorder.snapShot(this.playScreen);</span>
+<span class="nc" id="L294">                        } catch (IOException e) {</span>
+<span class="nc" id="L295">                            System.err.println(e);</span>
+                        }
+<span class="nc" id="L297">                        catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L298">                            System.err.println(e);</span>
+<span class="pc" id="L299">                        }</span>
+<span class="fc" id="L300">                        confirmSnapShot = false;</span>
+                    }
+<span class="fc" id="L302">                    stage--;</span>
+<span class="fc" id="L303">                    break;</span>
+                case KeyEvent.VK_ESCAPE:
+<span class="nc" id="L305">                    stage--;</span>
+<span class="nc" id="L306">                    break;</span>
+                default:
+                    break;
+            }
+        }
+<span class="fc" id="L311">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 用户按下的按键
+     * @return {Screen} 更新后的屏幕
+     * @description: 处理用户开始/结束记录游戏时的操作
+     */
+    private Screen record(KeyEvent key){
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">        if(stage == 1){ // 取消或者确认记录</span>
+<span class="pc bpc" id="L322" title="2 of 5 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_LEFT:
+<span class="fc" id="L324">                    confirmRecord = true;</span>
+<span class="fc" id="L325">                    break;</span>
+                case KeyEvent.VK_RIGHT:
+<span class="fc" id="L327">                    confirmRecord = false;</span>
+<span class="fc" id="L328">                    break;</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc bfc" id="L330" title="All 2 branches covered.">                    if(confirmRecord){</span>
+<span class="fc bfc" id="L331" title="All 2 branches covered.">                        if(switchRecord())</span>
+<span class="fc" id="L332">                            this.playScreen.startRecord();</span>
+                        else
+<span class="fc" id="L334">                            this.playScreen.endRecord();</span>
+<span class="fc" id="L335">                        confirmRecord = false;</span>
+                    }
+<span class="fc" id="L337">                    stage--;</span>
+<span class="fc" id="L338">                    break;</span>
+                case KeyEvent.VK_ESCAPE:
+<span class="nc" id="L340">                    stage--;</span>
+<span class="nc" id="L341">                    break;</span>
+                default:
+                    break;
+            }
+        }
+<span class="fc" id="L346">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @return {*}
+     * @description: 用于展示各个功能分支的第一阶段
+     */
+    private void displayStage_1(AsciiPanel terminal){ // 功能的第二阶段
+<span class="pc bpc" id="L356" title="1 of 5 branches missed.">        switch (this.branchIndex) {</span>
+            case 0: // 保存地图的功能
+<span class="fc bfc" id="L358" title="All 2 branches covered.">                if(confirmSaveMap){</span>
+<span class="fc" id="L359">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L360">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brown);</span>
+                }
+                else{
+<span class="fc" id="L363">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brown);</span>
+<span class="fc" id="L364">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+                }
+<span class="fc" id="L366">                break;</span>
+            case 1: // 重新开始游戏的功能
+<span class="fc bfc" id="L368" title="All 2 branches covered.">                if(confirmRestartGame){</span>
+<span class="fc" id="L369">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L370">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brown);</span>
+                }
+                else{
+<span class="fc" id="L373">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brown);</span>
+<span class="fc" id="L374">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+                }
+<span class="fc" id="L376">                break;</span>
+            case 2:
+<span class="fc bfc" id="L378" title="All 2 branches covered.">                if(confirmSnapShot){</span>
+<span class="fc" id="L379">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L380">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brown);</span>
+                }
+                else{
+<span class="fc" id="L383">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brown);</span>
+<span class="fc" id="L384">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+                }
+<span class="fc" id="L386">                break;</span>
+            case 3:
+<span class="fc bfc" id="L388" title="All 2 branches covered.">                if(confirmRecord){</span>
+<span class="fc" id="L389">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L390">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brown);</span>
+                }
+                else{
+<span class="fc" id="L393">                    terminal.write(&quot;Yes&quot;, 45, 25, AsciiPanel.brown);</span>
+<span class="fc" id="L394">                    terminal.write(&quot;No&quot;, 50, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+                }
+<span class="fc" id="L396">                break;</span>
+            default:
+                break;
+        }
+<span class="fc" id="L400">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 是否处于记录中状态
+     * @description: 切换记录状态
+     */
+    private boolean switchRecord(){
+<span class="fc" id="L408">        Pair&lt;String,Color&gt; targetPair = this.branches.get(3);</span>
+<span class="fc bfc" id="L409" title="All 2 branches covered.">        if(targetPair.getValue0() == &quot;Start Record&quot;) {</span>
+<span class="fc" id="L410">            this.branches.set(3, Pair.with(&quot;End Record&quot;, (Color)targetPair.getValue1()));</span>
+<span class="fc" id="L411">            return true;</span>
+        }
+        else {
+<span class="fc" id="L414">            this.branches.set(3, Pair.with(&quot;Start Record&quot;, (Color)targetPair.getValue1()));</span>
+<span class="fc" id="L415">            return false;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

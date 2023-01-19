@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StartScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.screen</a> &gt; <span class="el_source">StartScreen.java</span></div><h1>StartScreen.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 16:24:19
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为开始的选择界面类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\screen\StartScreen.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.screen;
+
+import cn.edu.nju.cs.game.asciiPanel.AsciiPanel;
+import cn.edu.nju.cs.logger.Recorder;
+import cn.edu.nju.cs.music.MusicStuff;
+
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.awt.Color;
+
+import org.javatuples.Pair;
+
+public class StartScreen extends RestartScreen {
+    private String addr;
+    private int playerIndex;
+    private List&lt;Pair&lt;String, Color&gt;&gt; characters;
+    private int musicNameIndex;
+    private List&lt;Pair&lt;String, Color&gt;&gt; musics;
+    private int mapNameIndex;
+    private List&lt;Pair&lt;String, Color&gt;&gt; maps;
+    private int snapShotIndex;
+    private List&lt;Pair&lt;String, Color&gt;&gt; snapShots;
+    private int recordIndex;
+    private List&lt;Pair&lt;String, Color&gt;&gt; records;
+<span class="fc" id="L54">    private int stage = 0; // 某个分支功能的进度</span>
+<span class="fc" id="L55">    private int branchIndex = 0;// 分支功能的下标</span>
+    private List&lt;Pair&lt;String,Color&gt;&gt; branches; // 功能分支
+    private MusicStuff musicStuff;
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L64">    public StartScreen(){</span>
+<span class="fc" id="L65">        this.addr = &quot;&quot;;</span>
+<span class="fc" id="L66">        this.playerIndex = 0;</span>
+<span class="fc" id="L67">        this.stage = 0;</span>
+<span class="fc" id="L68">        this.musicNameIndex = 0;</span>
+<span class="fc" id="L69">        this.branchIndex = 0;</span>
+<span class="fc" id="L70">        this.snapShotIndex = 0;</span>
+<span class="fc" id="L71">        this.recordIndex = 0;</span>
+
+<span class="fc" id="L73">        initialBranches();</span>
+<span class="fc" id="L74">        initialCharacters();</span>
+<span class="fc" id="L75">        initialMusics();</span>
+<span class="fc" id="L76">        initialMaps();</span>
+<span class="fc" id="L77">        initialSnapShot();</span>
+<span class="fc" id="L78">        initialRecord();</span>
+
+        // 播放音乐
+<span class="fc" id="L81">        musicStuff = new MusicStuff();</span>
+<span class="fc" id="L82">        musicStuff.playMusic(&quot;./src/main/resources/Title Screen.wav&quot;);</span>
+<span class="fc" id="L83">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @return {*}
+     * @description: 展示界面内容
+     */    
+    public void displayOutput(AsciiPanel terminal) {
+<span class="fc" id="L93">        terminal.clear();</span>
+<span class="pc bpc" id="L94" title="1 of 7 branches missed.">        switch (this.stage) {</span>
+            case 0:
+<span class="fc bfc" id="L96" title="All 2 branches covered.">                for(int i = 0; i &lt; this.branches.size(); i++){</span>
+<span class="fc" id="L97">                    String brachName = branches.get(i).getValue0();</span>
+<span class="fc" id="L98">                    Color color = branches.get(i).getValue1();</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">                    if(i == branchIndex)</span>
+<span class="fc" id="L100">                        terminal.write(padRight(brachName, 29, ' '), 35, 24 + i*2, color, AsciiPanel.brown);</span>
+                    else
+<span class="fc" id="L102">                        terminal.write(padRight(brachName, 29, ' '), 35, 24 + i*2, color);</span>
+                }
+<span class="fc" id="L104">                break;</span>
+            case 1:
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                if(branchIndex == 0){</span>
+<span class="fc" id="L107">                    terminal.write(&quot;Please Input Room Address:&quot;, 37, 24, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L108">                    terminal.write(addr, 37, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+                }
+<span class="fc bfc" id="L110" title="All 2 branches covered.">                else if(branchIndex == 1){</span>
+<span class="fc" id="L111">                    terminal.write(padRight(&quot;Please Select SNAPSHOT:&quot;, 29, ' '), 35 , 2, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L112">                    int snapIndexStart = Math.max(0, snapShotIndex-21);</span>
+<span class="fc" id="L113">                    int showSnapShotNumber = Math.min(22, this.snapShots.size());</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">                    for(int i = 0; i &lt; showSnapShotNumber; i++){</span>
+<span class="fc" id="L115">                        int targetSnapShotIndex = (snapIndexStart + i)%this.snapShots.size();</span>
+<span class="fc" id="L116">                        String snapShotName = snapShots.get(targetSnapShotIndex).getValue0();</span>
+<span class="fc" id="L117">                        Color color = snapShots.get(targetSnapShotIndex).getValue1();</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">                        if(targetSnapShotIndex == snapShotIndex)</span>
+<span class="fc" id="L119">                            terminal.write(padRight(snapShotName, 29, ' '), 35, 4 + i*2, color, AsciiPanel.brown);</span>
+                        else
+<span class="nc" id="L121">                            terminal.write(padRight(snapShotName, 29, ' '), 35, 4 + i*2, color);</span>
+                    }
+<span class="fc" id="L123">                }</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">                else if(branchIndex == 2){</span>
+<span class="fc" id="L125">                    terminal.write(padRight(&quot;Please Select RECORD:&quot;, 29, ' '), 35 , 2, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L126">                    int snapIndexStart = Math.max(0, recordIndex-21);</span>
+<span class="fc" id="L127">                    int showRecordNumber = Math.min(22, this.records.size());</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">                    for(int i = 0; i &lt; showRecordNumber; i++){</span>
+<span class="fc" id="L129">                        int targetRecordIndex = (snapIndexStart + i)%this.records.size();</span>
+<span class="fc" id="L130">                        String recordName = records.get(targetRecordIndex).getValue0();</span>
+<span class="fc" id="L131">                        Color color = records.get(targetRecordIndex).getValue1();</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">                        if(targetRecordIndex == recordIndex)</span>
+<span class="fc" id="L133">                            terminal.write(padRight(recordName, 29, ' '), 35, 4 + i*2, color, AsciiPanel.brown);</span>
+                        else
+<span class="fc" id="L135">                            terminal.write(padRight(recordName, 29, ' '), 35, 4 + i*2, color);</span>
+                    }
+<span class="fc" id="L137">                }</span>
+                break;
+            case 2:
+<span class="fc bfc" id="L140" title="All 2 branches covered.">                if(branchIndex == 0){</span>
+<span class="fc" id="L141">                    terminal.write(&quot;Please Select Your Character:&quot;, 35 , 18, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">                    for(int i = 0; i &lt; this.characters.size(); i++){</span>
+<span class="fc" id="L143">                        String name = characters.get(i).getValue0();</span>
+<span class="fc" id="L144">                        Color color = characters.get(i).getValue1();</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">                        if(i == playerIndex)</span>
+<span class="fc" id="L146">                            terminal.write(padRight(name, 29, ' '), 35, 20 + i*2, color, AsciiPanel.brown);</span>
+                        else
+<span class="fc" id="L148">                        terminal.write(padRight(name, 29, ' '), 35, 20 + i*2, color);</span>
+                    }
+                }
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">                else if(branchIndex == 1){</span>
+<span class="fc" id="L152">                    terminal.write(&quot;Press ENTER to START GAME!&quot;, 37, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+                }
+                break;
+            case 3:
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">                if(branchIndex == 0){</span>
+<span class="fc" id="L157">                    terminal.write(padRight(&quot;Please Select BGM:&quot;, 29, ' '), 35 , 2, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">                    for(int i = 0; i &lt; this.musics.size(); i++){</span>
+<span class="fc" id="L159">                        String musicName = musics.get(i).getValue0();</span>
+<span class="fc" id="L160">                        Color color = musics.get(i).getValue1();</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">                        if(i == musicNameIndex)</span>
+<span class="fc" id="L162">                            terminal.write(padRight(musicName, 29, ' '), 35, 4 + i*2, color, AsciiPanel.brown);</span>
+                        else
+<span class="fc" id="L164">                            terminal.write(padRight(musicName, 29, ' '), 35, 4 + i*2, color);</span>
+                    }
+                }
+                break;
+            case 4:
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">                if(branchIndex == 0){</span>
+<span class="fc" id="L170">                    terminal.write(padRight(&quot;Please Select MAP:&quot;, 29, ' '), 35 , 2, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+<span class="fc" id="L171">                    int mapIndexStart = Math.max(0, mapNameIndex-21);</span>
+<span class="fc" id="L172">                    int showMapNumber = Math.min(22, this.maps.size());</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">                    for(int i = 0; i &lt; showMapNumber; i++){</span>
+<span class="fc" id="L174">                        int targetMapIndex = (mapIndexStart + i)%this.maps.size();</span>
+<span class="fc" id="L175">                        String mapName = maps.get(targetMapIndex).getValue0();</span>
+<span class="fc" id="L176">                        Color color = maps.get(targetMapIndex).getValue1();</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">                        if(targetMapIndex == mapNameIndex)</span>
+<span class="fc" id="L178">                            terminal.write(padRight(mapName, 29, ' '), 35, 4 + i*2, color, AsciiPanel.brown);</span>
+                        else
+<span class="fc" id="L180">                            terminal.write(padRight(mapName, 29, ' '), 35, 4 + i*2, color);</span>
+                    }
+<span class="fc" id="L182">                }</span>
+                break;
+            case 5:
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">                if(branchIndex == 0){</span>
+<span class="fc" id="L186">                    terminal.write(&quot;Press ENTER to START GAME!&quot;, 37, 25, AsciiPanel.brightYellow, AsciiPanel.brown);</span>
+                }
+                break;
+            default:
+                break;
+        }
+<span class="fc" id="L192">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {*}
+     * @description: 响应玩家的键盘操作
+     */    
+    public Screen respondToUserInput(KeyEvent key) {
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">        if(key.getKeyCode() == KeyEvent.VK_ESCAPE){</span>
+<span class="nc" id="L203">            this.stage = Math.max(0, this.stage-1);</span>
+<span class="nc" id="L204">            return this;</span>
+        }
+
+<span class="pc bpc" id="L207" title="1 of 7 branches missed.">        switch (this.stage) {</span>
+            case 0:
+<span class="fc" id="L209">                selectBranches(key);</span>
+<span class="fc" id="L210">                return this;</span>
+            case 1:// 选择房间地址/选择快照/选择并查看记录
+<span class="fc bfc" id="L212" title="All 2 branches covered.">                if(branchIndex == 0) return this.chooseRoomAddr(key);</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">                else if(branchIndex == 1) return this.chooseSnapShot(key);</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">                else if(branchIndex == 2) return this.chooseRecord(key);</span>
+            case 2:// 选择人物/确认加载游戏
+<span class="fc bfc" id="L216" title="All 2 branches covered.">                if(branchIndex == 0) return this.choosePlayer(key);</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">                else if(branchIndex == 1)</span>
+                {
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">                    switch (key.getKeyCode()) {</span>
+                        case KeyEvent.VK_ENTER:
+                        {
+                            try {
+<span class="fc" id="L223">                                musicStuff.stop();</span>
+<span class="nc" id="L224">                                PlayScreen playScreen = Recorder.readSnapShot(snapShots.get(snapShotIndex).getValue0());</span>
+<span class="nc" id="L225">                                return new ClientPlaySreen(playScreen);</span>
+<span class="fc" id="L226">                            } catch (Exception e) {</span>
+<span class="fc" id="L227">                                e.printStackTrace();</span>
+                            }
+                        }
+                        default:
+<span class="fc" id="L231">                            return this;</span>
+                    }
+                }
+            case 3:// 选择音乐
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">                if(branchIndex == 0) return this.chooseMusic(key);</span>
+            case 4:
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">                if(branchIndex == 0) return this.chooseMap(key);</span>
+            case 5:// 开始游戏
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">                if(branchIndex == 0)</span>
+                {
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">                    switch (key.getKeyCode()) {</span>
+                        case KeyEvent.VK_ENTER:
+                        {
+<span class="fc" id="L244">                            musicStuff.stop();</span>
+<span class="fc" id="L245">                            String playerName = this.characters.get(this.playerIndex).getValue0();</span>
+<span class="fc" id="L246">                            String musicName = this.musics.get(this.musicNameIndex).getValue0();</span>
+<span class="fc" id="L247">                            String mapName = this.maps.get(this.mapNameIndex).getValue0();</span>
+                            // PlayScreen playScreen = new PlayScreen(this.addr, musicName, mapName);
+                            // playScreen.setPlayer(playScreen.creatureFactory().newPlayer
+                            //                     (playScreen.messages(), playerName));
+                            // return playScreen;
+<span class="nc" id="L252">                            return new ClientPlaySreen(this.addr, playerName, musicName, mapName);</span>
+                        }
+                        default:
+<span class="nc" id="L255">                            return this;</span>
+                    }
+                }
+
+            default:
+<span class="nc" id="L260">                return null;</span>
+        }
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的当前功能分支下标
+     */
+<span class="fc" id="L269">    public int branchIndex(){ return this.branchIndex; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的状态阶段
+     */
+<span class="fc" id="L276">    public int stage(){ return this.stage; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的代表当前记录文件的下标
+     */
+<span class="nc" id="L283">    public int recordIndex(){ return this.recordIndex; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的当前选择的玩家人物的下标
+     */
+<span class="nc" id="L290">    public int playerIndex(){ return this.playerIndex; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的当前选择的地图文件名的下标
+     */
+<span class="nc" id="L297">    public int mapNameIndex(){ return this.mapNameIndex; }</span>
+
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的当前选择的闪存文件名的下标
+     */
+<span class="nc" id="L305">    public int snapShotIndex(){ return this.snapShotIndex; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的当前选择的音乐名称下标
+     */
+<span class="nc" id="L312">    public int musicNameIndex(){ return this.musicNameIndex; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取启动界面的功能分支的数量
+     */
+<span class="fc" id="L319">    public int branchesSize(){ return this.branches.size(); }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 处理后的界面
+     * @description: 选择功能分支
+     */    
+    private Screen selectBranches(KeyEvent key){
+        // 开始选择功能
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">        if(stage == 0){ // 尚未结束选择，按下enter键结束功能分支选择</span>
+<span class="pc bpc" id="L330" title="1 of 4 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc" id="L332">                    stage++;    // 进入该功能分支的第二阶段</span>
+<span class="fc" id="L333">                    break;</span>
+                case KeyEvent.VK_UP:
+<span class="fc" id="L335">                    branchIndex = (branchIndex-1+this.branches.size())%this.branches.size();</span>
+<span class="fc" id="L336">                    break;</span>
+                case KeyEvent.VK_DOWN:
+<span class="fc" id="L338">                    branchIndex = (branchIndex+1)%this.branches.size();</span>
+                    break;
+            }
+        }
+<span class="fc" id="L342">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 处理后的界面
+     * @description: 选择房间地址
+     */    
+    private Screen chooseRoomAddr(KeyEvent key){
+        // 开始选择房间
+<span class="pc bpc" id="L353" title="2 of 4 branches missed.">        if(branchIndex == 0 &amp;&amp; stage == 1){ // 尚未结束输入，按下enter键结束房间地址的输入</span>
+<span class="pc bpc" id="L354" title="2 of 3 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc" id="L356">                    stage++;</span>
+<span class="fc" id="L357">                    break;</span>
+                case KeyEvent.VK_BACK_SPACE:
+<span class="nc bnc" id="L359" title="All 2 branches missed.">                    if(addr.length() &gt; 0)</span>
+<span class="nc" id="L360">                        addr = addr.substring(0, addr.length()-1);</span>
+                    break;
+                default:
+<span class="nc" id="L363">                    char c = key.getKeyChar();</span>
+<span class="nc bnc" id="L364" title="All 4 branches missed.">                    if(c &gt;= '0' &amp;&amp; c &lt;= '9')</span>
+<span class="nc" id="L365">                        addr += c;</span>
+                    break;
+            }
+        }
+<span class="fc" id="L369">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 处理后的界面
+     * @description: 选择人物
+     */    
+    private Screen choosePlayer(KeyEvent key){
+        // 开始选择人物
+<span class="pc bpc" id="L380" title="2 of 4 branches missed.">        if(branchIndex == 0 &amp;&amp; stage == 2){ // 尚未结束选择，按下enter键结束人物选择</span>
+<span class="pc bpc" id="L381" title="3 of 4 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc" id="L383">                    stage++;</span>
+<span class="fc" id="L384">                    break;</span>
+                case KeyEvent.VK_UP:
+<span class="nc bnc" id="L386" title="All 2 branches missed.">                    if(playerIndex &gt; 0) playerIndex--;</span>
+                    break;
+                case KeyEvent.VK_DOWN:
+<span class="nc bnc" id="L389" title="All 2 branches missed.">                    if(playerIndex &lt; this.characters.size()-1) playerIndex++;</span>
+                    break;
+            }
+        }
+<span class="fc" id="L393">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 处理后的界面
+     * @description: 选择音乐
+     */
+    private Screen chooseMusic(KeyEvent key){
+        // 开始选择音乐
+<span class="pc bpc" id="L404" title="2 of 4 branches missed.">        if(branchIndex == 0 &amp;&amp; stage == 3){ // 尚未结束选择，按下enter键结束音乐选择</span>
+<span class="pc bpc" id="L405" title="3 of 4 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc" id="L407">                    stage++;</span>
+<span class="fc" id="L408">                    break;</span>
+                case KeyEvent.VK_UP:
+<span class="nc" id="L410">                    musicNameIndex = (musicNameIndex-1+this.musics.size())%this.musics.size();</span>
+<span class="nc" id="L411">                    break;</span>
+                case KeyEvent.VK_DOWN:
+<span class="nc" id="L413">                    musicNameIndex = (musicNameIndex+1)%this.musics.size();</span>
+                    break;
+            }
+        }
+<span class="fc" id="L417">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 处理后的界面
+     * @description: 选择地图
+     */    
+    private Screen chooseMap(KeyEvent key){
+        // 开始选择地图
+<span class="pc bpc" id="L428" title="2 of 4 branches missed.">        if(branchIndex == 0 &amp;&amp; stage == 4){ // 尚未结束选择，按下enter键结束地图选择</span>
+<span class="pc bpc" id="L429" title="2 of 4 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc" id="L431">                    stage++;</span>
+<span class="fc" id="L432">                    break;</span>
+                case KeyEvent.VK_UP:
+<span class="nc" id="L434">                    mapNameIndex = (mapNameIndex-1+this.maps.size())%this.maps.size();</span>
+<span class="nc" id="L435">                    break;</span>
+                case KeyEvent.VK_DOWN:
+<span class="fc" id="L437">                    mapNameIndex = (mapNameIndex+1)%this.maps.size();</span>
+                    break;
+            }
+        }
+<span class="fc" id="L441">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 处理后的界面
+     * @description: 选择快照文件
+     */    
+    private Screen chooseSnapShot(KeyEvent key){
+        // 开始选择快照
+<span class="pc bpc" id="L452" title="2 of 4 branches missed.">        if(branchIndex == 1 &amp;&amp; stage == 1){ // 尚未结束选择，按下enter键结束快照选择</span>
+<span class="pc bpc" id="L453" title="3 of 4 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ENTER:
+<span class="fc" id="L455">                    stage++;</span>
+<span class="fc" id="L456">                    break;</span>
+                case KeyEvent.VK_UP:
+<span class="nc" id="L458">                    snapShotIndex = (snapShotIndex-1+this.snapShots.size())%this.snapShots.size();</span>
+<span class="nc" id="L459">                    break;</span>
+                case KeyEvent.VK_DOWN:
+<span class="nc" id="L461">                    snapShotIndex = (snapShotIndex+1)%this.snapShots.size();</span>
+                    break;
+            }
+        }
+<span class="fc" id="L465">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 处理后的界面
+     * @description: 选择记录文件
+     */    
+    private Screen chooseRecord(KeyEvent key){
+        // 开始选择记录
+<span class="pc bpc" id="L476" title="2 of 4 branches missed.">        if(branchIndex == 2 &amp;&amp; stage == 1){ // 尚未结束选择，按下enter键结束记录选择</span>
+<span class="nc bnc" id="L477" title="All 4 branches missed.">            switch (key.getKeyCode()) {</span>
+                case KeyEvent.VK_ENTER:
+<span class="nc" id="L479">                    return new ReviewScreen(this.records.get(this.recordIndex).getValue0(), this);</span>
+                case KeyEvent.VK_UP:
+<span class="nc" id="L481">                    recordIndex = (recordIndex-1+this.records.size())%this.records.size();</span>
+<span class="nc" id="L482">                    break;</span>
+                case KeyEvent.VK_DOWN:
+<span class="nc" id="L484">                    recordIndex = (recordIndex+1)%this.records.size();</span>
+                    break;
+            }
+        }
+<span class="nc" id="L488">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Pair&lt;String, Color&gt;&gt;} 音乐名的名称和颜色
+     * @description: 返回所有音乐的列表
+     */    
+    public List&lt;Pair&lt;String, Color&gt;&gt; musics(){
+<span class="fc" id="L497">        return this.musics;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 初始化功能分支
+     */    
+    private void initialBranches(){
+<span class="fc" id="L506">        this.branches = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L507">        Random random = new Random();</span>
+<span class="fc" id="L508">        this.branches.add(Pair.with(&quot;Start Game&quot;,</span>
+<span class="fc" id="L509">                        new Color(random.nextInt(255),</span>
+<span class="fc" id="L510">                                random.nextInt(255),</span>
+<span class="fc" id="L511">                                random.nextInt(255))));</span>
+<span class="fc" id="L512">        this.branches.add(Pair.with(&quot;Load Game&quot;,</span>
+<span class="fc" id="L513">                        new Color(random.nextInt(255),</span>
+<span class="fc" id="L514">                                random.nextInt(255),</span>
+<span class="fc" id="L515">                                random.nextInt(255))));</span>
+<span class="fc" id="L516">        this.branches.add(Pair.with(&quot;Record&quot;,</span>
+<span class="fc" id="L517">                        new Color(random.nextInt(255),</span>
+<span class="fc" id="L518">                                random.nextInt(255),</span>
+<span class="fc" id="L519">                                random.nextInt(255))));</span>
+<span class="fc" id="L520">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 初始化玩家人物
+     */    
+    private void initialCharacters(){
+<span class="fc" id="L528">        characters = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L529">        characters.add(Pair.with(&quot;FirstBro&quot;, Color.red));</span>
+<span class="fc" id="L530">        characters.add(Pair.with(&quot;SecondBro&quot;, Color.orange));</span>
+<span class="fc" id="L531">        characters.add(Pair.with(&quot;ThirdBro&quot;, Color.yellow));</span>
+<span class="fc" id="L532">        characters.add(Pair.with(&quot;ForthBro&quot;, Color.green));</span>
+<span class="fc" id="L533">        characters.add(Pair.with(&quot;FifthBro&quot;, Color.blue));</span>
+<span class="fc" id="L534">        characters.add(Pair.with(&quot;SixthBro&quot;, Color.cyan));</span>
+<span class="fc" id="L535">        characters.add(Pair.with(&quot;SeventhBro&quot;, Color.magenta));</span>
+<span class="fc" id="L536">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 初始化音乐
+     */    
+    private void initialMusics(){
+<span class="fc" id="L544">        musics =  new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L545">        musics.add(Pair.with(&quot;AlterNate Day&quot;, new Color(100,121,187)));</span>
+<span class="fc" id="L546">        musics.add(Pair.with(&quot;Alternate Underground&quot;, new Color(194,223,243)));</span>
+<span class="fc" id="L547">        musics.add(Pair.with(&quot;Corruption&quot;, new Color(57,106,151)));</span>
+<span class="fc" id="L548">        musics.add(Pair.with(&quot;Crimson&quot;, new Color(98,131,247)));</span>
+<span class="fc" id="L549">        musics.add(Pair.with(&quot;Desert&quot;, new Color(181,202,249)));</span>
+<span class="fc" id="L550">        musics.add(Pair.with(&quot;Dungeon&quot;, new Color(62,95,86)));</span>
+<span class="fc" id="L551">        musics.add(Pair.with(&quot;Eeric&quot;, new Color(66,155,73)));</span>
+<span class="fc" id="L552">        musics.add(Pair.with(&quot;Ice&quot;, new Color(119,175,172)));</span>
+<span class="fc" id="L553">        musics.add(Pair.with(&quot;Jungle Day&quot;, new Color(215,1,1)));</span>
+<span class="fc" id="L554">        musics.add(Pair.with(&quot;Mushrooms&quot;, new Color(37,164,82)));</span>
+<span class="fc" id="L555">        musics.add(Pair.with(&quot;Ocean&quot;, new Color(227,103,14)));</span>
+<span class="fc" id="L556">        musics.add(Pair.with(&quot;Overworld Day&quot;, new Color(187,106,106)));</span>
+<span class="fc" id="L557">        musics.add(Pair.with(&quot;Overworld Night&quot;, new Color(71,136,240)));</span>
+<span class="fc" id="L558">        musics.add(Pair.with(&quot;Rain&quot;, new Color(172,114,235)));</span>
+<span class="fc" id="L559">        musics.add(Pair.with(&quot;Sandstorm&quot;, new Color(40,221,208)));</span>
+<span class="fc" id="L560">        musics.add(Pair.with(&quot;Space&quot;, new Color(77,153,254)));</span>
+<span class="fc" id="L561">        musics.add(Pair.with(&quot;The Hallow&quot;, new Color(231,125,187)));</span>
+<span class="fc" id="L562">        musics.add(Pair.with(&quot;Town Night&quot;, new Color(196,181,90)));</span>
+<span class="fc" id="L563">        musics.add(Pair.with(&quot;Underground&quot;, new Color(108,183,229)));</span>
+<span class="fc" id="L564">        musics.add(Pair.with(&quot;Underworld&quot;, new Color(199,217,27)));</span>
+<span class="fc" id="L565">        musics.add(Pair.with(&quot;Windy Day&quot;, new Color(253,83,183)));</span>
+<span class="fc" id="L566">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 初始化地图
+     */    
+    private void initialMaps(){
+<span class="fc" id="L574">        Random random = new Random();</span>
+<span class="fc" id="L575">        String path = &quot;./src/main/resources/world&quot;;</span>
+<span class="fc" id="L576">		File dir = new File(path);</span>
+<span class="fc" id="L577">		File[] files = dir.listFiles();</span>
+<span class="fc" id="L578">        maps = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L579">        maps.add(Pair.with(&quot;New World&quot;,new Color(random.nextInt(255),</span>
+<span class="fc" id="L580">                                                        random.nextInt(255),</span>
+<span class="fc" id="L581">                                                        random.nextInt(255))));</span>
+<span class="fc bfc" id="L582" title="All 2 branches covered.">		for(File file : files){</span>
+<span class="pc bpc" id="L583" title="1 of 2 branches missed.">			if(!file.isDirectory()){</span>
+<span class="fc" id="L584">                String fileName = file.getName();</span>
+<span class="fc" id="L585">                fileName = fileName.substring(0, fileName.lastIndexOf(&quot;.&quot;));</span>
+<span class="fc" id="L586">                maps.add(Pair.with(fileName, new Color( random.nextInt(255),</span>
+<span class="fc" id="L587">                                                        random.nextInt(255),</span>
+<span class="fc" id="L588">                                                        random.nextInt(255))));</span>
+            }
+		}
+<span class="fc" id="L591">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 初始化快照
+     */    
+    private void initialSnapShot(){
+<span class="fc" id="L599">        Random random = new Random();</span>
+<span class="fc" id="L600">        String path = &quot;./src/main/resources/snapShot&quot;;</span>
+<span class="fc" id="L601">		File dir = new File(path);</span>
+<span class="fc" id="L602">		File[] files = dir.listFiles();</span>
+<span class="fc" id="L603">        snapShots = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L604" title="All 2 branches covered.">		for(File file : files){</span>
+<span class="pc bpc" id="L605" title="1 of 2 branches missed.">			if(!file.isDirectory()){</span>
+<span class="fc" id="L606">                String fileName = file.getName();</span>
+<span class="fc" id="L607">                fileName = fileName.substring(0, fileName.lastIndexOf(&quot;.&quot;));</span>
+<span class="fc" id="L608">                snapShots.add(Pair.with(fileName, new Color(random.nextInt(255),</span>
+<span class="fc" id="L609">                                                            random.nextInt(255),</span>
+<span class="fc" id="L610">                                                            random.nextInt(255))));</span>
+            }
+		}
+<span class="fc" id="L613">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 初始化记录
+     */    
+    private void initialRecord(){
+<span class="fc" id="L621">        Random random = new Random();</span>
+<span class="fc" id="L622">        String path = &quot;./src/main/resources/record&quot;;</span>
+<span class="fc" id="L623">		File dir = new File(path);</span>
+<span class="fc" id="L624">		File[] files = dir.listFiles();</span>
+<span class="fc" id="L625">        records = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L626" title="All 2 branches covered.">		for(File file : files){</span>
+<span class="pc bpc" id="L627" title="1 of 2 branches missed.">			if(!file.isDirectory()){</span>
+<span class="fc" id="L628">                String fileName = file.getName();</span>
+<span class="fc" id="L629">                fileName = fileName.substring(0, fileName.lastIndexOf(&quot;.&quot;));</span>
+<span class="fc" id="L630">                records.add(Pair.with(fileName,new Color(random.nextInt(255),</span>
+<span class="fc" id="L631">                                                        random.nextInt(255),</span>
+<span class="fc" id="L632">                                                        random.nextInt(255))));</span>
+            }
+		}
+<span class="fc" id="L635">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} src 原始字符串
+     * @param {int} len 目标字符串长度
+     * @param {char} ch 用于对齐时填充的字符
+     * @return {String} 对齐后的字符串
+     * @description: 将原始的字符串进行右侧对齐
+     */
+    public static String padRight(String src, int len, char ch) {
+<span class="fc" id="L646">        int diff = len - src.length();</span>
+<span class="pc bpc" id="L647" title="1 of 2 branches missed.">        if (diff &lt;= 0) {</span>
+<span class="nc" id="L648">            return src;</span>
+        }
+
+<span class="fc" id="L651">        char[] charr = new char[len];</span>
+<span class="fc" id="L652">        System.arraycopy(src.toCharArray(), 0, charr, 0, src.length());</span>
+<span class="fc bfc" id="L653" title="All 2 branches covered.">        for (int i = src.length(); i &lt; len; i++) {</span>
+<span class="fc" id="L654">            charr[i] = ch;</span>
+        }
+<span class="fc" id="L656">        return new String(charr);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

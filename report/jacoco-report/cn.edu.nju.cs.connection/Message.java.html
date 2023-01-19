@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Message.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.connection</a> &gt; <span class="el_source">Message.java</span></div><h1>Message.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-12-25 09:39:17
+ * @LastEditTime: 2023-01-16 10:36:54
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为客户机和服务器之间交互的消息类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\connection\Message.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.connection;
+
+import java.io.Serializable;
+
+import cn.edu.nju.cs.game.screen.*;
+import cn.edu.nju.cs.game.world.creature.bros.Player;
+
+public class Message implements Serializable{
+    private PlayScreen playScreen;
+    private String playerName;
+    private int playerIndex;
+    private int roomAddr;
+    private String info;
+
+    /**
+     * @author: Xu YangXin
+     * @param {PlayScreen} playScreen 房间
+     * @param {String} playerName 玩家名称
+     * @param {int} playerIndex 玩家下标
+     * @param {int} roomAddr 房间地址
+     * @param {String} info 消息信息
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L51">    public Message(PlayScreen playScreen, String playerName, int playerIndex, int roomAddr, String info){</span>
+<span class="fc" id="L52">        this.playScreen = playScreen;</span>
+<span class="fc" id="L53">        this.playerName = playerName;</span>
+<span class="fc" id="L54">        this.playerIndex = playerIndex;</span>
+<span class="fc" id="L55">        this.roomAddr = roomAddr;</span>
+<span class="fc" id="L56">        this.info = info;</span>
+<span class="fc" id="L57">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {String}
+     * @description: 覆写Object类的toString()方法
+     */    
+    public String toString(){
+<span class="fc" id="L66">        return this.info;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {byte[]} data
+     * @return {Message}
+     * @description: 将代表数据的字节数组转换成目标的Message对象
+     */
+    public static Message dataToObj(byte[] data){
+<span class="fc" id="L76">        Message message = null;</span>
+<span class="fc" id="L77">        Object obj = ByteArrayUtils.bytesToObject(data).get();</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if(obj instanceof Message)</span>
+<span class="fc" id="L79">            message = (Message)obj;</span>
+<span class="fc" id="L80">        return message;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {PlayScreen}
+     * @description: 读取消息中的房间字段
+     */
+    public PlayScreen playScreen(){
+<span class="fc" id="L89">        return this.playScreen;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {PlayScreen} playScreen 房间
+     * @return {*}
+     * @description: 设置消息中的房间字段
+     */
+    public void setPlayScreen(PlayScreen playScreen){
+<span class="nc" id="L99">        this.playScreen = playScreen;</span>
+<span class="nc" id="L100">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {String}
+     * @description: 读取消息中的玩家姓名字段
+     */    
+    public String playerName(){
+<span class="fc" id="L108">        return this.playerName;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} playerName 玩家名称
+     * @return {*}
+     * @description: 设置消息中的玩家名称字段
+     */    
+    public void setPlayName(String playerName){
+<span class="nc" id="L118">        this.playerName = playerName;</span>
+<span class="nc" id="L119">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取消息中的玩家下标字段
+     */    
+    public int playerIndex(){
+<span class="fc" id="L127">        return this.playerIndex;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} playerIndex 玩家下标
+     * @return {*}
+     * @description: 设置玩家下标字段
+     */    
+    public void setPlayerIndex(int playerIndex){
+<span class="nc" id="L137">        this.playerIndex = playerIndex;</span>
+<span class="nc" id="L138">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int}
+     * @description: 读取消息中的房间地址字段
+     */    
+    public int roomAddr(){
+<span class="fc" id="L146">        return this.roomAddr;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} roomAddr 房间地址
+     * @return {*}
+     * @description: 设置消息中的房间地址字段
+     */    
+    public void setRoomAddr(int roomAddr){
+<span class="nc" id="L156">        this.roomAddr = roomAddr;</span>
+<span class="nc" id="L157">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Player}
+     * @description: 根据消息提取出玩家信息
+     */    
+    public Player player(){
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if(this.playScreen == null)</span>
+<span class="nc" id="L166">            return null;</span>
+<span class="fc" id="L167">        return this.playScreen.world().searchPlayer(playerIndex);</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {String}
+     * @description: 读取消息中的信息字段
+     */    
+    public String info(){
+<span class="fc" id="L176">        return this.info;</span>
+    }
+
+    public static final String CONNECT_MESSAGE = &quot;Client connect room&quot;;
+    public static final String BACK_CONNECT_ROOM_MESSAGE = &quot;Server response connect room&quot;;
+    public static final String ADD_ROOM_MESSAGE = &quot;Client add new room&quot;;
+    public static final String BACK_ADD_ROOM_MESSAGE = &quot;Server response add new room&quot;;
+    public static final String ENTER_ROOM_MESSAGE = &quot;Client enter room&quot;;
+    public static final String BACK_ENTER_ROOM_MESSAGE = &quot;Server response enter room&quot;;
+    public static final String GET_LATEST_ROOM_MESSAGE = &quot;Client get latest room&quot;;
+    public static final String BACK_GET_LATEST_ROOM_MESSAGE = &quot;Server response get latest room&quot;;
+    public static final String MOVE_LEFT_MESSAGE = &quot;Client move left&quot;;
+    public static final String MOVE_RIGHT_MESSAGE = &quot;Client move right&quot;;
+    public static final String MOVE_UP_MESSAGE = &quot;Client move up&quot;;
+    public static final String MOVE_DOWN_MESSAGE = &quot;Client move down&quot;;
+    public static final String BACK_MOVE_MESSAGE = &quot;Server response move&quot;;
+    public static final String ATTACK_MESSAGE = &quot;Client attack&quot;;
+    public static final String BACK_ATTACK_MESSAGE = &quot;Server response attack&quot;;
+    public static final String BIG_ATTACK_MESSAGE = &quot;Client big attack&quot;;
+    public static final String BACK_BIG_ATTACK_MESSAGE = &quot;Server response big attack&quot;;
+    public static final String SWITCH_WEAPON_MESSAGE = &quot;Client switch weapon&quot;;
+    public static final String BACK_SWITCH_WEAPON_MESSAGE = &quot;Server response switch weapon&quot;;
+    public static final String SET_BOMB_MESSAGE = &quot;Client set bomb&quot;;
+    public static final String BACK_SET_BOMB_MESSAGE = &quot;Server response set bomb&quot;;
+    public static final String THROWABLE_WEAPON_MOVE_LEFT_MESSAGE = &quot;Client's throwable weapon move left&quot;;
+    public static final String THROWABLE_WEAPON_MOVE_RIGHT_MESSAGE = &quot;Client's throwable weapon move right&quot;;
+    public static final String THROWABLE_WEAPON_MOVE_UP_MESSAGE = &quot;Client's throwable weapon move up&quot;;
+    public static final String THROWABLE_WEAPON_MOVE_DOWN_MESSAGE = &quot;Client's throwable weapon move down&quot;;
+    public static final String BACK_THROWABLE_WEAPON_MOVE_MESSAGE = &quot;Server response throwable weapon move&quot;;
+    public static final String WORLD_PAUSE_MESSAGE = &quot;Client pause world&quot;;
+    public static final String BACK_WORLD_PAUSE_MESSAGE = &quot;Server response pause world&quot;;
+    public static final String WORLD_RECOVER_MESSAGE = &quot;Client recover world&quot;;
+    public static final String BACK_WORLD_RECOVER_MESSGAE = &quot;Server response recover world&quot;;
+    public static final String LOAD_ROOM_MESSAGE = &quot;Client load room&quot;;
+    public static final String BACK_LOAD_ROOM_MESSAGE = &quot;Server response load room&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Bomb.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.bomb</a> &gt; <span class="el_source">Bomb.java</span></div><h1>Bomb.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 16:53:06
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为炸弹类。
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\bomb\Bomb.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.bomb;
+
+import java.awt.Color;
+import java.io.Serializable;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import cn.edu.nju.cs.game.asciiPanel.*;
+import cn.edu.nju.cs.game.world.item.World;
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.creature.Direction;
+
+public class Bomb implements Serializable{
+    private World world;
+    private Creature master;
+    private int x;
+    private int y;
+    private int range;
+    private char glyph;
+    private char glyph_bomb_x;
+    private char glyph_bomb_y;
+    private Color color;
+    private int attackValue;
+    private boolean active;
+    private boolean alive;
+
+    transient private Timer moveTimer;
+    transient private TimerTask moveLeft;
+    transient private TimerTask moveRight;
+    transient private TimerTask moveUp;
+    transient private TimerTask moveDown;
+
+<span class="fc" id="L61">    private static ReentrantReadWriteLock lockX = new ReentrantReadWriteLock();</span>
+<span class="fc" id="L62">    private static ReentrantReadWriteLock.ReadLock readLockX = lockX.readLock();</span>
+<span class="fc" id="L63">    private static ReentrantReadWriteLock.WriteLock writeLockX = lockX.writeLock();</span>
+<span class="fc" id="L64">    private static ReentrantReadWriteLock lockY = new ReentrantReadWriteLock();</span>
+<span class="fc" id="L65">    private static ReentrantReadWriteLock.ReadLock readLockY = lockY.readLock();</span>
+<span class="fc" id="L66">    private static ReentrantReadWriteLock.WriteLock writeLockY = lockY.writeLock();</span>
+
+    public static final int MOVE_SPEED_INTERVAL = 300;
+
+    /**
+     * @author: Xu YangXin
+     * @param {World} world 炸弹所处世界
+     * @param {Creature} master 炸弹的主人
+     * @param {int} x 炸弹的x坐标
+     * @param {int} y 炸弹的y坐标
+     * @param {char} glyph 炸弹的字符形象
+     * @param {Color} color 炸弹的颜色
+     * @param {int} attack 炸弹的攻击力
+     * @return {*}
+     * @description: 构造器
+     */
+<span class="fc" id="L82">    public Bomb(World world, Creature master, int x, int y, char glyph, Color color, int attack) {</span>
+<span class="fc" id="L83">        this.world = world;</span>
+<span class="fc" id="L84">        this.master = master;</span>
+<span class="fc" id="L85">        this.x = x;</span>
+<span class="fc" id="L86">        this.y = y;</span>
+<span class="fc" id="L87">        this.glyph = glyph;</span>
+<span class="fc" id="L88">        this.glyph_bomb_x = Tile.BOMB_X.glyph();</span>
+<span class="fc" id="L89">        this.glyph_bomb_y = Tile.BOMB_Y.glyph();</span>
+<span class="fc" id="L90">        this.color = color;</span>
+<span class="fc" id="L91">        this.attackValue = attack;</span>
+<span class="fc" id="L92">        this.range = 1;</span>
+<span class="fc" id="L93">        this.active = false;</span>
+<span class="fc" id="L94">        this.alive = true;</span>
+<span class="fc" id="L95">        moveLeft =</span>
+<span class="fc" id="L96">        new TimerTask() {</span>
+            public void run(){
+<span class="nc bnc" id="L98" title="All 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L99">                    return;</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">                if(!moveLeft())</span>
+<span class="nc" id="L101">                    stopMove();</span>
+<span class="nc" id="L102">            }</span>
+        };
+<span class="fc" id="L104">        moveRight =</span>
+<span class="fc" id="L105">        new TimerTask() {</span>
+            public void run(){
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L108">                    return;</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">                if(!moveRight())</span>
+<span class="nc" id="L110">                    stopMove();</span>
+<span class="nc" id="L111">            }</span>
+        };
+<span class="fc" id="L113">        moveUp =</span>
+<span class="fc" id="L114">        new TimerTask() {</span>
+            public void run(){
+<span class="nc bnc" id="L116" title="All 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L117">                    return;</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">                if(!moveUp())</span>
+<span class="nc" id="L119">                    stopMove();</span>
+<span class="nc" id="L120">            }</span>
+        };
+<span class="fc" id="L122">        moveDown =</span>
+<span class="fc" id="L123">        new TimerTask() {</span>
+            public void run(){
+<span class="nc bnc" id="L125" title="All 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L126">                    return;</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">                if(!moveDown())</span>
+<span class="nc" id="L128">                    stopMove();</span>
+<span class="nc" id="L129">            }</span>
+        };
+<span class="fc" id="L131">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {Bomb} bomb 样板炸弹
+     * @param {int} x 炸弹的x坐标
+     * @param {int} y 炸弹的y坐标
+     * @return {*}
+     * @description: 复制构造器
+     */    
+<span class="fc" id="L141">    public Bomb(Bomb other, int x, int y){</span>
+<span class="fc" id="L142">        this.world = other.world();</span>
+<span class="fc" id="L143">        this.master = other.master();</span>
+<span class="fc" id="L144">        this.x = x;</span>
+<span class="fc" id="L145">        this.y = y;</span>
+<span class="fc" id="L146">        this.glyph = other.glyph();</span>
+<span class="fc" id="L147">        this.glyph_bomb_x = other.glyphBombX();</span>
+<span class="fc" id="L148">        this.glyph_bomb_y = other.glyphBombY();</span>
+<span class="fc" id="L149">        this.color = other.color();</span>
+<span class="fc" id="L150">        this.attackValue = other.attackValue();</span>
+<span class="fc" id="L151">        this.range = other.range();</span>
+<span class="fc" id="L152">        this.active = other.isActive();</span>
+<span class="fc" id="L153">        this.alive = other.isAlive();</span>
+<span class="fc" id="L154">        this.moveTimer = null;</span>
+
+<span class="fc" id="L156">        moveLeft =</span>
+<span class="fc" id="L157">        new TimerTask() {</span>
+            public void run(){
+<span class="nc bnc" id="L159" title="All 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L160">                    return;</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                if(!moveLeft())</span>
+<span class="nc" id="L162">                    stopMove();</span>
+<span class="nc" id="L163">            }</span>
+        };
+<span class="fc" id="L165">        moveRight =</span>
+<span class="fc" id="L166">        new TimerTask() {</span>
+            public void run(){
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L169">                    return;</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">                if(!moveRight())</span>
+<span class="nc" id="L171">                    stopMove();</span>
+<span class="fc" id="L172">            }</span>
+        };
+<span class="fc" id="L174">        moveUp =</span>
+<span class="fc" id="L175">        new TimerTask() {</span>
+            public void run(){
+<span class="nc bnc" id="L177" title="All 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L178">                    return;</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">                if(!moveUp())</span>
+<span class="nc" id="L180">                    stopMove();</span>
+<span class="nc" id="L181">            }</span>
+        };
+<span class="fc" id="L183">        moveDown =</span>
+<span class="fc" id="L184">        new TimerTask() {</span>
+            public void run(){
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                if(master().world().worldIsPaused())</span>
+<span class="nc" id="L187">                    return;</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">                if(!moveDown())</span>
+<span class="nc" id="L189">                    stopMove();</span>
+<span class="nc" id="L190">            }</span>
+        };
+<span class="fc" id="L192">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {World} 炸弹所处世界
+     * @description: 读取炸弹所处的世界
+     */    
+    public World world(){
+<span class="fc" id="L200">        return world;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {World} world 目标世界
+     * @return {*}
+     * @description: 设置炸弹所处世界
+     */    
+    public void setWorld(World world){
+<span class="nc" id="L210">        this.world = world;</span>
+<span class="nc" id="L211">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Creature} 生物
+     * @description: 读取设置炸弹的主人
+     */    
+    public Creature master(){
+<span class="fc" id="L219">        return this.master;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} creature 目标生物
+     * @return {*}
+     * @description: 设置炸弹的主人
+     */    
+    public void setMaster(Creature creature){
+<span class="nc" id="L229">        this.master = creature;</span>
+<span class="nc" id="L230">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 炸弹的x坐标
+     * @description: 获取炸弹的x坐标
+     */    
+    public int x() {
+<span class="fc" id="L238">        int tempX = 0;</span>
+<span class="fc" id="L239">        readLockX.lock();</span>
+        try {
+<span class="fc" id="L241">            tempX = this.x;</span>
+        } finally {
+<span class="fc" id="L243">            readLockX.unlock();</span>
+        }
+<span class="fc" id="L245">        return tempX;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 炸弹的y坐标
+     * @description: 获取炸弹的y坐标
+     */    
+    public int y() {
+<span class="fc" id="L254">        int tempY = 0;</span>
+<span class="fc" id="L255">        readLockY.lock();</span>
+        try {
+<span class="fc" id="L257">            tempY = y;</span>
+        } finally {
+<span class="fc" id="L259">            readLockY.unlock();</span>
+        }
+<span class="fc" id="L261">        return tempY;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 炸弹左移是否成功
+     * @description: 炸弹左移一步
+     */    
+    public boolean moveLeft(){
+<span class="fc" id="L270">        int tempX = x(), tempY = y();</span>
+<span class="pc bpc" id="L271" title="2 of 4 branches missed.">        if(world.inBound(tempX-1, tempY) &amp;&amp; world.tile(tempX-1, tempY).isGround()){</span>
+<span class="fc" id="L272">            writeLockX.lock();</span>
+            try {
+<span class="fc" id="L274">                this.x--;</span>
+<span class="nc" id="L275">                this.refreshWorld(tempX, tempY);</span>
+            } finally {
+<span class="nc" id="L277">                writeLockX.unlock();</span>
+            }
+<span class="nc" id="L279">            return true;</span>
+        }
+
+<span class="nc" id="L282">        return false;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 炸弹右移是否成功
+     * @description: 炸弹右移一步
+     */    
+    public boolean moveRight(){
+<span class="fc" id="L291">        int tempX = x(), tempY = y();</span>
+<span class="pc bpc" id="L292" title="2 of 4 branches missed.">        if(world.inBound(tempX+1, tempY) &amp;&amp; world.tile(tempX+1, tempY).isGround()){</span>
+<span class="fc" id="L293">            writeLockX.lock();</span>
+            try {
+<span class="fc" id="L295">                this.x++;</span>
+<span class="fc" id="L296">                this.refreshWorld(tempX, tempY);</span>
+            } finally {
+<span class="fc" id="L298">                writeLockX.unlock();</span>
+            }
+<span class="fc" id="L300">            return true;</span>
+        }
+
+<span class="nc" id="L303">        return false;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 炸弹上移是否成功
+     * @description: 炸弹上移一步
+     */    
+    public boolean moveUp(){
+<span class="fc" id="L312">        int tempX = x(), tempY = y();</span>
+<span class="pc bpc" id="L313" title="2 of 4 branches missed.">        if(world.inBound(tempX, tempY-1) &amp;&amp; world.tile(tempX, tempY-1).isGround()){</span>
+<span class="fc" id="L314">            writeLockY.lock();</span>
+            try {
+<span class="fc" id="L316">                this.y--;</span>
+<span class="nc" id="L317">                this.refreshWorld(tempX, tempY);</span>
+            } finally {
+<span class="nc" id="L319">                writeLockY.unlock();</span>
+            }
+<span class="nc" id="L321">            return true;</span>
+        }
+
+<span class="nc" id="L324">        return false;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 炸弹下移是否成功
+     * @description: 炸弹下移是否成功
+     */    
+    public boolean moveDown(){
+<span class="fc" id="L333">        int tempX = x(), tempY = y();</span>
+<span class="pc bpc" id="L334" title="2 of 4 branches missed.">        if(world.inBound(tempX, tempY+1) &amp;&amp; world.tile(tempX, tempY+1).isGround()){</span>
+<span class="nc" id="L335">            writeLockY.lock();</span>
+            try {
+<span class="nc" id="L337">                this.y++;</span>
+<span class="nc" id="L338">                this.refreshWorld(tempX, tempY);</span>
+            } finally {
+<span class="nc" id="L340">                writeLockY.unlock();</span>
+            }
+<span class="nc" id="L342">            return true;</span>
+        }
+
+<span class="nc" id="L345">        return false;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} oldX 炸弹的旧x坐标
+     * @param {int} oldY 炸弹的旧y坐标
+     * @return {*}
+     * @description: 刷新世界，设置炸弹的新位置并删除旧位置的图像
+     */    
+    private void refreshWorld(int oldX, int oldY){
+<span class="fc" id="L356">        int newX = this.x(), newY = this.y();</span>
+<span class="fc" id="L357">        this.world.setThing(Tile.FLOOR, oldX, oldY);</span>
+<span class="fc" id="L358">        this.world.setThing(Tile.BOMB, newX, newY);</span>
+<span class="fc" id="L359">        return;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 炸弹的爆炸范围
+     * @description: 获取炸弹的爆炸范围
+     */    
+    public int range(){
+<span class="fc" id="L368">        return range;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 扩展炸弹的爆炸范围+1
+     */    
+    public void expandRange(){
+<span class="nc" id="L377">        range++;</span>
+<span class="nc" id="L378">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} creature 目标生物
+     * @return {boolean}
+     * @description: 判断生物是否在炸弹的爆炸范围内
+     */    
+    public boolean isInRange(Creature creature){
+<span class="fc" id="L387">        int dis_x = Math.abs(creature.x() - this.x);</span>
+<span class="fc" id="L388">        int dis_y = Math.abs(creature.y() - this.y);</span>
+<span class="pc bpc" id="L389" title="1 of 4 branches missed.">        if(dis_x == 0 &amp;&amp; dis_y &lt;= range)</span>
+<span class="fc" id="L390">            return true;</span>
+<span class="pc bpc" id="L391" title="3 of 4 branches missed.">        if(dis_x &lt;= range &amp;&amp; dis_y == 0)</span>
+<span class="nc" id="L392">            return true;</span>
+<span class="fc" id="L393">        return false;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {char} 炸弹的字符形象
+     * @description: 获取炸弹的字符形象
+     */    
+    public char glyph() {
+<span class="fc" id="L402">        return this.glyph;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {char} 炸弹横向爆炸冲击波的字符形象
+     * @description: 获取炸弹横向爆炸冲击波的字符形象
+     */    
+    public char glyphBombX(){
+<span class="fc" id="L411">        return glyph_bomb_x;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {char} 炸弹纵向爆炸冲击波的字符形象
+     * @description: 获取炸弹纵向爆炸冲击波的字符形象
+     */    
+    public char glyphBombY(){
+<span class="fc" id="L420">        return glyph_bomb_y;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Color} 炸弹的颜色
+     * @description: 获取炸弹的颜色
+     */    
+    public Color color() {
+<span class="fc" id="L429">        return this.color;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 炸弹的攻击力
+     * @description: 获取炸弹的攻击力
+     */    
+    public int attackValue() {
+<span class="fc" id="L438">        return this.attackValue;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 炸弹是否激活
+     * @description: 查看炸弹是否被激活
+     */    
+    public boolean isActive(){
+<span class="fc" id="L447">        return active;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 激活炸弹
+     */    
+    public void activate(){
+<span class="fc" id="L456">        this.active = true;</span>
+<span class="fc" id="L457">        this.color = AsciiPanel.red;</span>
+<span class="fc" id="L458">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 炸弹是否还活着
+     * @description: 查看炸弹是否活着(存在)
+     */    
+    public boolean isAlive(){
+<span class="fc" id="L466">        return alive;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 让炸弹死亡
+     */    
+    public void dead(){
+<span class="fc" id="L475">        this.alive = false;</span>
+<span class="fc" id="L476">        this.active = false;</span>
+<span class="fc" id="L477">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} wx x坐标
+     * @param {int} wy y坐标
+     * @return {Tile} 地形
+     * @description: 获取地图上某坐标的地形，若不存在则返回null
+     */    
+    public Tile tile(int wx, int wy) {
+<span class="nc" id="L487">        return world.tile(wx, wy);</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} other 目标生物
+     * @return {*}
+     * @description: 炸弹攻击目标生物
+     */    
+    public void attack(Creature other){
+<span class="fc bfc" id="L497" title="All 2 branches covered.">        if(!this.isInRange(other))</span>
+<span class="fc" id="L498">            return;</span>
+
+<span class="fc" id="L500">        other.modifyHP(-attackValue);</span>
+<span class="fc" id="L501">        this.master.chargeEnergy();</span>
+<span class="fc" id="L502">        return;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Direction} direction 移动方向
+     * @return {boolean} 开始移动是否成功
+     * @description: 让炸弹向某个方向开始移动
+     */    
+    public boolean startMove(Direction direction){
+<span class="fc" id="L512">        moveTimer = new Timer();</span>
+<span class="pc bpc" id="L513" title="1 of 5 branches missed.">        switch (direction) {</span>
+            case Left:
+<span class="fc" id="L515">                moveTimer.schedule(moveLeft, 0, Bomb.MOVE_SPEED_INTERVAL);</span>
+<span class="fc" id="L516">                break;</span>
+            case Right:
+<span class="fc" id="L518">                moveTimer.schedule(moveRight, 0, Bomb.MOVE_SPEED_INTERVAL);</span>
+<span class="fc" id="L519">                break;</span>
+            case Up:
+<span class="fc" id="L521">                moveTimer.schedule(moveUp, 0, Bomb.MOVE_SPEED_INTERVAL);</span>
+<span class="fc" id="L522">                break;</span>
+            case Down:
+<span class="fc" id="L524">                moveTimer.schedule(moveDown, 0, Bomb.MOVE_SPEED_INTERVAL);</span>
+<span class="fc" id="L525">                break;</span>
+            default:
+                break;
+        }
+<span class="fc" id="L529">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 让炸弹停止移动
+     */    
+    public void stopMove(){
+        try {
+<span class="nc" id="L539">            moveTimer.cancel();</span>
+<span class="nc" id="L540">            moveTimer = null;</span>
+<span class="fc" id="L541">        } catch (NullPointerException e) {</span>
+            // e.printStackTrace();
+<span class="nc" id="L543">        }</span>
+<span class="fc" id="L544">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

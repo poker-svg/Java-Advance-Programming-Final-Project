@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DetonatorThrower.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.throwable</a> &gt; <span class="el_source">DetonatorThrower.java</span></div><h1>DetonatorThrower.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 20:11:44
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为爆竹发射器类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\throwable\DetonatorThrower.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.throwable;
+
+import cn.edu.nju.cs.game.world.weapon.WeaponFactory;
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.item.Tile;
+
+public class DetonatorThrower extends ThrowableWeapon{
+    public static final int RANGE = 15;   // 可抛掷距离
+    public static final String NAME = &quot;DetonatorThrower&quot;;
+<span class="fc" id="L36">    public static final Tile IMAGE = Tile.DETONATOR_THROWER;</span>
+    public static final int ATTACK_VALUE = 80;
+    public static final int COLDING_INTERVAL = 2000;
+    public static final int MAX_ENERGY = 7;
+    public static final int ADD_ITEM_INTERVAL = 3000;
+    public static final int MAX_ITEM_AMOUNT = 3;
+    public static final int ACTIVATE_INTERVAL = 1000;
+
+    /**
+     * @author: Xu YangXin
+     * @param {WeaponFactory} factory 生产该爆竹发射器的武器工厂
+     * @param {ThrowableItem} throwableItemSample 爆竹发射器的抛掷物
+     * @return {*}
+     * @description: 爆竹发射器的构造器
+     */
+    public DetonatorThrower(WeaponFactory factory, ThrowableItem throwableItemSample){
+<span class="fc" id="L52">        super(factory, DetonatorThrower.NAME, DetonatorThrower.IMAGE, DetonatorThrower.ATTACK_VALUE,</span>
+            DetonatorThrower.RANGE, DetonatorThrower.COLDING_INTERVAL, DetonatorThrower.MAX_ENERGY,
+            DetonatorThrower.ADD_ITEM_INTERVAL, DetonatorThrower.MAX_ITEM_AMOUNT, throwableItemSample);
+<span class="fc" id="L55">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 爆竹发射器的普攻是否成功
+     * @description: 爆竹发射器普攻，在某个区域投掷爆竹
+     */    
+    public boolean attack(){
+<span class="pc bpc" id="L64" title="1 of 4 branches missed.">        if(!this.isActive() ||          // 爆竹发射器处于冷却周期中</span>
+            this.remainingItems &lt;= 0)  // 爆竹数量不足
+<span class="fc" id="L66">            return false;               // 攻击失败</span>
+
+<span class="fc" id="L68">        this.remainingItems--;</span>
+
+<span class="fc" id="L70">        Creature master = this.factory().master();</span>
+<span class="fc" id="L71">        int x = master.x()+this.dx, y = master.y()+this.dy;</span>
+
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if(master.world().inBound(x, y))</span>
+<span class="fc" id="L74">            master.world().addThrowableItem(new ThrowableItem(x, y, throwableItemSample));</span>
+
+<span class="fc" id="L76">        return true;</span>
+    }
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 抛掷类武器的大招是否成功释放
+     * @description: 抛掷类武器释放大招 —— 更大的爆竹攻击范围
+     */    
+    public boolean bigAttack(){
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if(this.curEnergy &lt; this.maxEnergy)// 能量不足</span>
+<span class="fc" id="L87">            return false;                  // 攻击失败</span>
+
+<span class="fc" id="L89">        this.throwableItemSample.enlargeRange();</span>
+<span class="fc" id="L90">        boolean ret = this.attack();</span>
+<span class="fc" id="L91">        this.throwableItemSample.shrinkRange();</span>
+<span class="fc" id="L92">        return ret;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

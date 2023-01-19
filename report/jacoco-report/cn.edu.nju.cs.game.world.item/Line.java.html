@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Line.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.item</a> &gt; <span class="el_source">Line.java</span></div><h1>Line.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 18:10:35
+ * @LastEditors: Xu YangXin
+ * @Description: 此类代表世界中的直线
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\item\Line.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.item;
+
+import java.awt.Point;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class Line implements Iterable&lt;Point&gt;, Serializable{
+
+    private List&lt;Point&gt; points;
+
+    /**
+     * @author: Xu YangXin
+     * @param {Point} p1 起始点
+     * @param {Point} p2 终止点
+     * @description: 构造器
+     */    
+    public Line(Point p1, Point p2) {
+<span class="nc" id="L46">        this(p1.x, p1.y, p2.x, p2.y);</span>
+<span class="nc" id="L47">    }</span>
+    /**
+     * @author: Xu YangXin
+     * @param {int} x0 起始点的x坐标
+     * @param {int} y0 起始点的y坐标
+     * @param {int} x1 终止点的x坐标
+     * @param {int} y1 终止点的y坐标
+     * @description: 构造器
+     */    
+<span class="fc" id="L56">    public Line(int x0, int y0, int x1, int y1) {</span>
+<span class="fc" id="L57">        this.points = new ArrayList&lt;Point&gt;();</span>
+
+<span class="fc" id="L59">        int dx = Math.abs(x1 - x0);</span>
+<span class="fc" id="L60">        int dy = Math.abs(y1 - y0);</span>
+
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        int sx = x0 &lt; x1 ? 1 : -1;</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        int sy = y0 &lt; y1 ? 1 : -1;</span>
+<span class="fc" id="L64">        int err = dx - dy;</span>
+
+        while (true) {
+<span class="fc" id="L67">            this.points.add(new Point(x0, y0));</span>
+<span class="fc bfc" id="L68" title="All 4 branches covered.">            if(dx == 0 || dy == 0){ // 同一行</span>
+<span class="fc bfc" id="L69" title="All 4 branches covered.">                if(x0 == x1 &amp;&amp; y0 == y1)</span>
+<span class="fc" id="L70">                    break;</span>
+            }
+<span class="fc bfc" id="L72" title="All 4 branches covered.">            else if (x0 == x1 || y0 == y1) { // 不是同一行</span>
+<span class="fc" id="L73">                break;</span>
+            }
+
+<span class="fc" id="L76">            int e2 = err * 2;</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">            if (e2 &gt; -dy) {</span>
+<span class="fc" id="L78">                err -= dy;</span>
+<span class="fc" id="L79">                x0 += sx;</span>
+            }
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            if (e2 &lt; dx) {</span>
+<span class="fc" id="L82">                err += dx;</span>
+<span class="fc" id="L83">                y0 += sy;</span>
+            }
+<span class="fc" id="L85">        }</span>
+        ;
+<span class="fc" id="L87">    }</span>
+
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Point&gt;} 点列表
+     * @description: 获取直线上的所有点
+     */    
+    public List&lt;Point&gt; getPoints() {
+<span class="nc" id="L96">        return this.points;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Iterator&lt;Point&gt;} 点的迭代器
+     * @description: 读取直线上的点集列表的迭代器
+     */    
+    public Iterator&lt;Point&gt; iterator() {
+<span class="fc" id="L105">        return points.iterator();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

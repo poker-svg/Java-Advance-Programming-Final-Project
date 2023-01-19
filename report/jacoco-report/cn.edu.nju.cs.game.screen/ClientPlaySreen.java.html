@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClientPlaySreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.screen</a> &gt; <span class="el_source">ClientPlaySreen.java</span></div><h1>ClientPlaySreen.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ *
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-12-13 14:41:25
+ * @LastEditTime: 2023-01-16 15:33:55
+ * @LastEditors: Xu YangXin
+ * @Description: 此类代表用户的游戏界面
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\screen\ClientPlaySreen.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.screen;
+
+import cn.edu.nju.cs.connection.Client;
+import cn.edu.nju.cs.game.asciiPanel.AsciiPanel;
+import cn.edu.nju.cs.game.world.creature.bros.Player;
+import cn.edu.nju.cs.logger.Recorder;
+import cn.edu.nju.cs.music.MusicStuff;
+
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+
+public class ClientPlaySreen implements Screen{
+    private int roomAddr;
+    private int playerIndex;
+    private String playerName;
+    private String musicName;
+    private String mapName;
+    private Client client;
+    private PlayScreen playScreen;
+    private MusicStuff musicStuff;
+    private boolean recordFlag;
+    private Recorder recorder;
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} roomAddr 房间地址(只含数字)
+     * @param {String} playerName 玩家名字
+     * @param {Stirng} musicName 音乐名称
+     * @param {String} mapName 地图名称
+     * @return {*}
+     * @description: 客户游戏界面构造器
+     */
+<span class="fc" id="L59">    public ClientPlaySreen(String roomAddr, String playerName, String musicName, String mapName){</span>
+<span class="nc" id="L60">        this.roomAddr = Integer.parseInt(roomAddr);</span>
+<span class="nc" id="L61">        this.playerName = playerName;</span>
+<span class="nc" id="L62">        this.musicName = musicName;</span>
+<span class="nc" id="L63">        this.mapName = mapName;</span>
+<span class="nc" id="L64">        this.musicStuff = new MusicStuff();</span>
+<span class="nc" id="L65">        this.musicStuff.playMusic(&quot;./src/main/resources/&quot;+ musicName + &quot;.wav&quot;);</span>
+
+<span class="nc" id="L67">        PlayScreen newRoom = new PlayScreen(roomAddr, musicName, mapName);</span>
+<span class="nc" id="L68">        newRoom.musicStuff().stop();</span>
+<span class="nc" id="L69">        this.client = new Client(this.roomAddr,</span>
+                                 this.playerName,
+                                 newRoom);
+
+<span class="nc" id="L73">        this.playerIndex = this.client.playerIndex();</span>
+<span class="nc" id="L74">        this.roomAddr = this.client.roomAddr();</span>
+<span class="nc" id="L75">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {PlayScreen} snapShotPlayScreen
+     * @return {*}
+     * @description: 用户加载游戏闪照构造器
+     */    
+<span class="nc" id="L83">    public ClientPlaySreen(PlayScreen snapShotPlayScreen){</span>
+<span class="nc" id="L84">        this.playScreen = snapShotPlayScreen;</span>
+<span class="nc" id="L85">        this.playScreen.musicStuff().stop();</span>
+<span class="nc" id="L86">        this.roomAddr = Integer.parseInt(snapShotPlayScreen.playScreenAddress());</span>
+<span class="nc" id="L87">        this.playerName = snapShotPlayScreen.player().getClass().getSimpleName();</span>
+<span class="nc" id="L88">        this.musicName = snapShotPlayScreen.musicName();</span>
+<span class="nc" id="L89">        this.mapName = null;</span>
+<span class="nc" id="L90">        this.musicStuff = new MusicStuff();</span>
+<span class="nc" id="L91">        this.musicStuff.playMusic(&quot;./src/main/resources/&quot;+ this.musicName + &quot;.wav&quot;);</span>
+
+<span class="nc" id="L93">        this.client = new Client(roomAddr,</span>
+                                playerIndex,
+                                snapShotPlayScreen);
+
+<span class="nc" id="L97">        this.playerIndex = this.client.playerIndex();</span>
+<span class="nc" id="L98">        this.roomAddr = this.client.roomAddr();</span>
+<span class="nc" id="L99">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @return {*}
+     * @description: 用于展示当前游戏界面
+     */
+    public void displayOutput(AsciiPanel terminal){
+<span class="nc" id="L109">        this.playScreen = this.client.getLatestRoom();</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if(playScreen == null) // 房间不存在</span>
+<span class="nc" id="L111">            return;</span>
+
+<span class="nc" id="L113">        Player player = this.playScreen.world().searchPlayer(this.playerIndex);</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if(player == null)</span>
+<span class="nc" id="L115">            return;</span>
+<span class="nc" id="L116">        this.playScreen.setPlayer(player);</span>
+<span class="nc" id="L117">        this.playScreen.setMessages(player.messages());</span>
+<span class="nc" id="L118">        this.playScreen.setOldMessages(player.oldMessages());</span>
+<span class="nc" id="L119">        this.playScreen.resetAllAI();</span>
+<span class="nc" id="L120">        this.playScreen.displayTiles(terminal, playScreen.getScrollX(), playScreen.getScrollY());</span>
+<span class="nc" id="L121">        this.playScreen.displayPlayerInfo(terminal);</span>
+<span class="nc" id="L122">        this.playScreen.displayCurWeaponInfo(terminal);</span>
+<span class="nc" id="L123">        this.playScreen.displayMessages(terminal, playScreen.messages());</span>
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if(this.recordFlag)</span>
+<span class="nc" id="L126">            this.recorder.saveSnapShot(this.playScreen);</span>
+<span class="nc" id="L127">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {Screen} 响应后的屏幕
+     * @description: 响应玩家键盘操作
+     */
+    public Screen respondToUserInput(KeyEvent key){
+<span class="nc bnc" id="L137" title="All 4 branches missed.">        if(this.playScreen == null || this.playScreen.player().hp() &lt; 1){</span>
+<span class="nc" id="L138">            this.musicStuff.stop();</span>
+<span class="nc" id="L139">            return new LoseScreen();</span>
+        }
+
+<span class="nc bnc" id="L142" title="All 4 branches missed.">        if(this.playScreen.world().worldIsPaused() &amp;&amp; key.getKeyCode() != KeyEvent.VK_ESCAPE)</span>
+<span class="nc" id="L143">            return this;</span>
+
+<span class="nc bnc" id="L145" title="All 3 branches missed.">        switch (key.getKeyCode()) {</span>
+            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_UP:
+            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_SPACE:
+            case KeyEvent.VK_X:
+            case KeyEvent.VK_Z:
+            case KeyEvent.VK_C:
+            case KeyEvent.VK_W:
+            case KeyEvent.VK_S:
+            case KeyEvent.VK_A:
+            case KeyEvent.VK_D:
+<span class="nc" id="L158">                this.client.operation(key);</span>
+<span class="nc" id="L159">                break;</span>
+            case KeyEvent.VK_ESCAPE:
+<span class="nc" id="L161">                this.client.operation(key);</span>
+<span class="nc" id="L162">                this.musicStuff.stop();</span>
+<span class="nc" id="L163">                return new ClientPauseScreen(this);</span>
+        }
+
+<span class="nc" id="L166">        return this;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 开始记录
+     */    
+    public void startRecord(){
+<span class="nc" id="L175">        this.recorder = new Recorder();</span>
+<span class="nc" id="L176">        this.recordFlag = true;</span>
+<span class="nc" id="L177">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 停止记录
+     */    
+    public void endRecord(){
+<span class="nc" id="L185">        this.recordFlag = false;</span>
+        try {
+<span class="nc" id="L187">            Recorder.writeRecorder(recorder);</span>
+<span class="nc" id="L188">        } catch (IOException e) {</span>
+<span class="nc" id="L189">            e.printStackTrace();</span>
+<span class="nc" id="L190">        } catch (ClassNotFoundException e){</span>
+<span class="nc" id="L191">            e.printStackTrace();</span>
+<span class="nc" id="L192">        }</span>
+<span class="nc" id="L193">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean}
+     * @description: 读取游戏玩家游戏界面是否处于记录中的状态
+     */    
+<span class="nc" id="L200">    public boolean recordFlag(){ return this.recordFlag; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Client}
+     * @description: 读取玩家游戏界面的负责与服务器进行交互的客户端对象
+     */
+<span class="nc" id="L207">    public Client client(){ return this.client; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {MusicStuff}
+     * @description: 读取玩家游戏界面中负责BGM播放的音乐播放器
+     */    
+<span class="nc" id="L214">    public MusicStuff musicStuff(){ return this.musicStuff; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {PlayScreen}
+     * @description: 读取玩家游戏界面中的游戏界面
+     */    
+<span class="nc" id="L221">    public PlayScreen playScreen(){ return this.playScreen; }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

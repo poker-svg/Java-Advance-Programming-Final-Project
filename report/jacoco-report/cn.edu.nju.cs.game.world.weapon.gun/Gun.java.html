@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Gun.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.gun</a> &gt; <span class="el_source">Gun.java</span></div><h1>Gun.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 17:29:13
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为所有远程攻击武器的抽象基类 —— 枪类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\gun\Gun.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.gun;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.weapon.Weapon;
+import cn.edu.nju.cs.game.world.weapon.WeaponFactory;
+
+public abstract class Gun extends Weapon{
+    protected int remainingBullet; // 剩余子弹个数
+    transient protected Timer addBulletTimer; //添加子弹的计时器
+    protected Bullet bulletSample; // 子弹样板，用于子弹的复制
+    protected int addBulletInterval; // 添加子弹的间隔时间，单位毫秒
+    protected int maxBulletAmount; // 弹匣容量
+
+    /**
+     * @author: Xu YangXin
+     * @param {WeaponFactory} factory 生产该枪械的武器工厂
+     * @param {String} name 枪械名称
+     * @param {Tile} image 枪械图像
+     * @param {int} attackValue 枪械攻击力
+     * @param {int} range 枪械射击距离
+     * @param {int} coldingInterval 枪械冷却间隔时间，单位ms
+     * @param {int} maxEnergy 枪械的最大能量值
+     * @param {int} addBulletInterval 枪械的添加子弹的周期时间
+     * @param {int} maxBulletAmount 枪械的弹匣容量
+     * @param {Bullet} bulletSample 枪械所装的子弹
+     * @return {*}
+     * @description: 构造器
+     */
+    public Gun(WeaponFactory factory, String name, Tile image,
+            int attackValue, int range, int coldingInterval, int maxEnergy,
+            int addBulletInterval, int maxBulletAmount, Bullet bulletSample){
+<span class="fc" id="L61">        super(factory, name, image, attackValue, range, coldingInterval, maxEnergy);</span>
+<span class="fc" id="L62">        this.remainingBullet = 0;</span>
+<span class="fc" id="L63">        this.addBulletInterval = addBulletInterval;</span>
+<span class="fc" id="L64">        this.maxBulletAmount = maxBulletAmount;</span>
+<span class="fc" id="L65">        this.bulletSample = bulletSample;</span>
+
+<span class="fc" id="L67">        startAddBulletTimer();</span>
+<span class="fc" id="L68">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 枪的剩余子弹数量
+     * @description: 获取枪的剩余子弹数量
+     */    
+    public int remainingBullet(){
+<span class="fc" id="L76">        return this.remainingBullet;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 为枪添加子弹
+     */    
+    public void addBullet(){
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if(remainingBullet &lt; maxBulletAmount)</span>
+<span class="fc" id="L86">            this.remainingBullet++;</span>
+<span class="fc" id="L87">        return;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 添加子弹的间隔时间
+     * @description: 获取添加子弹的间隔时间
+     */    
+    public int addBulletInterval(){
+<span class="nc" id="L96">        return this.addBulletInterval;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 枪的弹匣容量
+     * @description: 获取枪的弹匣容量
+     */    
+    public int maxBulletAmount(){
+<span class="fc" id="L105">        return this.maxBulletAmount;</span>
+    }
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 枪械攻击力提升20%
+     */    
+    public void attackUpgrade(){
+<span class="nc" id="L115">        this.attackValue = (int)(this.attackValue*1.2);</span>
+<span class="nc" id="L116">        this.bulletSample.attackUpgrade();</span>
+<span class="nc" id="L117">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 启动枪械添加子弹的计时器
+     */    
+    public void startAddBulletTimer(){
+        // 周期性添加子弹
+<span class="fc" id="L126">        addBulletTimer = new Timer();</span>
+<span class="fc" id="L127">        addBulletTimer.schedule(</span>
+<span class="fc" id="L128">        new TimerTask() {</span>
+            public void run() {
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">                if(factory().master().world().worldIsPaused())</span>
+<span class="nc" id="L131">                    return;</span>
+<span class="fc" id="L132">                addBullet();</span>
+<span class="fc" id="L133">            }</span>
+        }, addBulletInterval , addBulletInterval);
+<span class="fc" id="L135">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

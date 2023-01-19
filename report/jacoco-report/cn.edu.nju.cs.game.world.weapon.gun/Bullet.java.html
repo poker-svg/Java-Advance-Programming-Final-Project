@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Bullet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.gun</a> &gt; <span class="el_source">Bullet.java</span></div><h1>Bullet.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 17:05:33
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为子弹类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\gun\Bullet.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.gun;
+
+import java.io.Serializable;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.creature.Direction;
+
+public class Bullet implements Serializable{
+    private int x; // 子弹坐标x
+    private int y; // 子弹坐标y
+    protected int range; // 子弹有效范围
+    private Direction direction; // 子弹方向
+    protected int attackValue; // 伤害值
+    protected Tile image; // 子弹图案
+    private int speedInterval; // 代表子弹速度的时间，单位毫秒
+    transient protected Timer movTimer; // 子弹移动计时器
+    private Creature master;  // 子弹的主人
+
+    
+    // 通过此构造函数创造的子弹都是样弹，用于以后枪械的发射子弹的复制
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 子弹的x坐标
+     * @param {int} y 子弹的y坐标
+     * @param {Direction} direction 子弹的飞行方向
+     * @param {int} range 子弹的飞行距离
+     * @param {int} attackValue 子弹的攻击力
+     * @param {Tile} image 子弹的图像
+     * @param {int} speedInterval 子弹的飞行间隔时间
+     * @param {Creature} master 子弹的主人
+     * @return {*}
+     * @description: 构造器
+     */
+    public Bullet(int x, int y, Direction direction, int range, int attackValue,
+<span class="fc" id="L64">                    Tile image, int speedInterval, Creature master) {</span>
+<span class="fc" id="L65">        this.x = x;</span>
+<span class="fc" id="L66">        this.y = y;</span>
+<span class="fc" id="L67">        this.direction = direction;</span>
+<span class="fc" id="L68">        this.range = range;</span>
+<span class="fc" id="L69">        this.attackValue = attackValue;</span>
+<span class="fc" id="L70">        this.image = image;</span>
+<span class="fc" id="L71">        this.speedInterval = speedInterval;</span>
+<span class="fc" id="L72">        this.master = master;</span>
+<span class="fc" id="L73">        movTimer = null;</span>
+<span class="fc" id="L74">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 子弹的x坐标
+     * @param {int} y 子弹的y坐标
+     * @param {Direction} direction 子弹的飞行方向
+     * @param {Bullet} bullet 子弹
+     * @return {*}
+     * @description: 复制构造器
+     */
+<span class="fc" id="L85">    public Bullet(int x, int y, Direction direction, Bullet bullet) {</span>
+<span class="fc" id="L86">        this.x = x;</span>
+<span class="fc" id="L87">        this.y = y;</span>
+<span class="fc" id="L88">        this.direction = direction;</span>
+<span class="fc" id="L89">        this.range = bullet.range();</span>
+<span class="fc" id="L90">        this.attackValue = bullet.attackValue();</span>
+<span class="fc" id="L91">        this.image = bullet.image();</span>
+<span class="fc" id="L92">        this.speedInterval = bullet.speedInterval();</span>
+<span class="fc" id="L93">        this.master = bullet.master();</span>
+<span class="fc" id="L94">        startMove();</span>
+<span class="fc" id="L95">    }</span>
+
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 子弹的x坐标
+     * @description: 获取子弹的x坐标
+     */    
+    public int x() {
+<span class="fc" id="L104">        return this.x;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 子弹的x坐标
+     * @return {*}
+     * @description: 设置子弹的x坐标
+     */    
+    public void setX(int x) {
+<span class="fc" id="L114">        this.x = x;</span>
+<span class="fc" id="L115">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 子弹的y坐标
+     * @description: 获取子弹的y坐标
+     */    
+    public int y() {
+<span class="fc" id="L123">        return this.y;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} y 子弹的y坐标
+     * @return {*}
+     * @description: 设置子弹的y坐标
+     */    
+    public void setY(int y) {
+<span class="fc" id="L133">        this.y = y;</span>
+<span class="fc" id="L134">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 子弹的飞行距离
+     * @description: 获取子弹的飞行距离
+     */    
+    public int range() {
+<span class="fc" id="L142">        return this.range;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Direction} 子弹的飞行方向
+     * @description: 获取子弹的飞行方向
+     */    
+    public Direction direction() {
+<span class="fc" id="L151">        return this.direction;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 子弹的攻击力
+     * @description: 获取子弹的攻击力
+     */    
+    public int attackValue() {
+<span class="fc" id="L160">        return this.attackValue;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 将子弹的攻击力翻倍
+     */    
+    public void doubleAttackValue(){ // 双倍伤害
+<span class="fc" id="L169">        this.attackValue = this.attackValue*2;</span>
+<span class="fc" id="L170">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 子弹的攻击力提升20%
+     */    
+    public void attackUpgrade(){
+<span class="nc" id="L178">        this.attackValue = (int)(this.attackValue*1.2);</span>
+<span class="nc" id="L179">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Tile} 子弹的图像
+     * @description: 获取子弹的图像
+     */    
+    public Tile image() {
+<span class="fc" id="L187">        return this.image;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 子弹的飞行间隔时间
+     * @description: 获取子弹的飞行间隔时间
+     */    
+    public int speedInterval() {
+<span class="fc" id="L196">        return speedInterval;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Creature} 子弹的主人
+     * @description: 获取子弹的主人
+     */    
+    public Creature master(){
+<span class="fc" id="L205">        return this.master;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 子弹开始飞行
+     */    
+    public void startMove(){
+<span class="fc" id="L214">        movTimer = new Timer();</span>
+<span class="fc" id="L215">        movTimer.schedule(</span>
+<span class="fc" id="L216">                new TimerTask() {</span>
+                    public void run() {
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">                        if(master().world().worldIsPaused())</span>
+<span class="nc" id="L219">                            return;</span>
+<span class="pc bpc" id="L220" title="1 of 2 branches missed.">                        if (range &lt; 1)</span>
+<span class="nc" id="L221">                            return;</span>
+<span class="fc" id="L222">                        range--;</span>
+
+<span class="fc" id="L224">                        int temp_x = x();</span>
+<span class="fc" id="L225">                        int temp_y = y();</span>
+<span class="pc bpc" id="L226" title="1 of 9 branches missed.">                        switch (direction()) {</span>
+<span class="fc" id="L227">                            case Left:      temp_x--; break;</span>
+<span class="fc" id="L228">                            case Right:     temp_x++; break;</span>
+<span class="fc" id="L229">                            case Up:        temp_y--; break;</span>
+<span class="fc" id="L230">                            case Down:      temp_y++; break;</span>
+<span class="fc" id="L231">                            case LeftUp:    temp_x--; temp_y--; break;</span>
+<span class="fc" id="L232">                            case LeftDown:  temp_x--; temp_y++; break;</span>
+<span class="fc" id="L233">                            case RightUp:   temp_x++; temp_y--; break;</span>
+<span class="fc" id="L234">                            case RightDown: temp_x++; temp_y++; break;</span>
+                        }
+
+<span class="fc" id="L237">                        setX(temp_x);</span>
+<span class="fc" id="L238">                        setY(temp_y);</span>
+<span class="fc" id="L239">                    }</span>
+                }, this.speedInterval, this.speedInterval);
+<span class="fc" id="L241">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} creature 目标生物
+     * @return {*}
+     * @description: 子弹攻击目标生物
+     */    
+    public boolean attack(Creature creature){
+<span class="nc bnc" id="L250" title="All 4 branches missed.">        if(this.x != creature.x() || this.y != creature.y())</span>
+<span class="nc" id="L251">            return false;</span>
+
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        if(this.master == creature) // 友伤取消</span>
+<span class="nc" id="L254">            return false;</span>
+
+<span class="nc" id="L256">        int damage = Math.max(0, this.attackValue - creature.defenseValue());</span>
+<span class="nc" id="L257">        damage = (int) ((Math.random()+1) * damage) + 1; // 1-2倍暴击率</span>
+
+<span class="nc" id="L259">        creature.modifyHP(-damage);</span>
+<span class="nc" id="L260">        this.master.chargeEnergy();</span>
+<span class="nc" id="L261">        creature.notify(&quot;The '%s' attacks you for %d damage.&quot;, this.image().glyph(), damage);</span>
+<span class="nc" id="L262">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

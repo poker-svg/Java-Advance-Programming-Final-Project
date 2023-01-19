@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Melee.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.melee</a> &gt; <span class="el_source">Melee.java</span></div><h1>Melee.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 18:11:55
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为近战武器类，是所有近战武器的抽象基类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\melee\Melee.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.melee;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.edu.nju.cs.game.world.weapon.Weapon;
+import cn.edu.nju.cs.game.world.weapon.WeaponFactory;
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.creature.Direction;
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.item.World;
+
+public abstract class Melee extends Weapon{
+    protected Shape shape; // 攻击形状
+    protected int remainTime; // 一次攻击的持续时间
+    protected AttackDot attackDotSample; // 攻击点样板，用于攻击点的复制
+
+    /**
+     * @author: Xu YangXin
+     * @param {WeaponFactory} factory 生产近战武器的武器工厂
+     * @param {String} name 近战武器的名称
+     * @param {Tile} image 近战武器的图像
+     * @param {int} attackValue 近战武器的攻击力
+     * @param {int} range 近战武器的攻击范围
+     * @param {int} coldingInterval 近战武器的冷却间隔时间，单位为ms
+     * @param {int} maxEnergy 近战武器的最大能量
+     * @param {Shape} shape 近战武器的攻击形状，有扇形、半圆形、圆形
+     * @param {int} remainTime 近战武器的残存时间(攻击持续时间)
+     * @param {AttackDot} attackDotSample 近战武器的攻击点
+     * @return {*}
+     * @description: 近战武器的构造器
+     */    
+    public Melee(WeaponFactory factory, String name, Tile image,
+                int attackValue, int range, int coldingInterval, int maxEnergy,
+                Shape shape, int remainTime, AttackDot attackDotSample){
+<span class="fc" id="L62">        super(factory, name, image, attackValue, range, coldingInterval, maxEnergy);</span>
+<span class="fc" id="L63">        this.shape = shape;</span>
+<span class="fc" id="L64">        this.remainTime = remainTime;</span>
+<span class="fc" id="L65">        this.attackDotSample = attackDotSample;</span>
+<span class="fc" id="L66">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Shape} 近战武器的攻击形状
+     * @description: 读取近战武器的攻击形状
+     */    
+    public Shape shape(){
+<span class="nc" id="L74">        return this.shape;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 近战武器的攻击持续时间
+     * @description: 读取近战武器的攻击持续时间
+     */    
+    public int remainTime(){
+<span class="nc" id="L83">        return this.remainTime;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 近战武器的攻击力提升20%
+     */    
+    public void attackUpgrade(){
+<span class="nc" id="L92">        this.attackValue = (int)(this.attackValue*1.2);</span>
+<span class="nc" id="L93">        this.attackDotSample.attackUpgrade();</span>
+<span class="nc" id="L94">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 近战武器的普攻是否成功
+     * @description: 近战武器的普攻
+     */    
+    public boolean attack() {
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if(!this.isActive())// 武器处于冷却周期中</span>
+<span class="nc" id="L104">            return false;   // 攻击失败</span>
+
+<span class="fc" id="L106">        Creature master = this.factory().master();</span>
+
+<span class="pc bpc" id="L108" title="2 of 4 branches missed.">        switch (this.shape) {</span>
+            case Quater:
+<span class="nc" id="L110">                attackQuater(master.x(),master.y(),master.direction(),</span>
+<span class="nc" id="L111">                            master.world(),this.attackDotSample);</span>
+<span class="nc" id="L112">                break;</span>
+            case Half:
+<span class="fc" id="L114">                attackHalf(master.x(),master.y(),master.direction(),</span>
+<span class="fc" id="L115">                            master.world(),this.attackDotSample);</span>
+<span class="fc" id="L116">                break;</span>
+            case Full:
+<span class="fc" id="L118">                attackFull(master.x(),master.y(),</span>
+<span class="fc" id="L119">                            master.world(),this.attackDotSample);</span>
+<span class="fc" id="L120">                break;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L125">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 攻击起始点的x坐标
+     * @param {int} y 攻击起始点的y坐标
+     * @param {Direction} direction 攻击方向
+     * @param {World} world 近战武器所处世界
+     * @param {AttackDot} attackDot 近战武器的攻击点
+     * @return {boolean} 攻击是否成功
+     * @description: 近战武器向扇形区域发起攻击
+     */    
+    private boolean attackQuater(int x, int y, Direction direction, World world, AttackDot attackDot){
+<span class="nc" id="L139">        List&lt;AttackDot&gt; dots = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L140" title="All 5 branches missed.">        switch (direction) {</span>
+            case Left:
+            {
+<span class="nc" id="L143">                int width = 1;</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">                for(int col = x - 1; col &gt;= x - range; col--){</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">                    for(int row = y - width; row &lt;= y + width; row++)</span>
+<span class="nc" id="L146">                        dots.add(new AttackDot(col, row, attackDot));</span>
+<span class="nc" id="L147">                    width++;</span>
+                }
+<span class="nc" id="L149">                break;</span>
+            }
+            case Right:
+            {
+<span class="nc" id="L153">                int width = 1;</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">                for(int col = x + 1; col &lt;= x + range; col++){</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">                    for(int row = y - width; row &lt;= y + width; row++)</span>
+<span class="nc" id="L156">                        dots.add(new AttackDot(col, row, attackDot));</span>
+<span class="nc" id="L157">                    width++;</span>
+                }
+<span class="nc" id="L159">                break;</span>
+            }
+            case Up:
+            {
+<span class="nc" id="L163">                int width = 1;</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">                for(int row = y - 1; row &gt;= y - range; row--){</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">                    for(int col = x - width; col &lt;= x + width; col++)</span>
+<span class="nc" id="L166">                        dots.add(new AttackDot(col, row, attackDot));</span>
+<span class="nc" id="L167">                    width++;</span>
+                }
+<span class="nc" id="L169">                break;</span>
+            }
+            case Down:
+            {
+<span class="nc" id="L173">                int width = 1;</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                for(int row = y + 1; row &lt;= y + range; row++){</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">                    for(int col = x - width; col &lt;= x + width; col++)</span>
+<span class="nc" id="L176">                        dots.add(new AttackDot(col, row, attackDot));</span>
+<span class="nc" id="L177">                    width++;</span>
+                }
+<span class="nc" id="L179">                break;</span>
+            }
+            default:
+                break;
+        }
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if(dots.isEmpty())</span>
+<span class="nc" id="L185">            return false;</span>
+
+<span class="nc" id="L187">        world.addAttackDot(dots);</span>
+<span class="nc" id="L188">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 攻击起始点的x坐标
+     * @param {int} y 攻击起始点的y坐标
+     * @param {Direction} direction 攻击方向
+     * @param {World} world 近战武器所处世界
+     * @param {AttackDot} attackDot 近战武器的攻击点
+     * @return {boolean} 攻击是否成功
+     * @description: 近战武器向半圆区域发起攻击
+     */    
+    private boolean attackHalf(int x, int y, Direction direction, World world, AttackDot attackDot){
+<span class="fc" id="L202">        List&lt;AttackDot&gt; dots = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L203" title="1 of 5 branches missed.">        switch (direction) {</span>
+            case Left:
+            {
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                for(int col = x - 1; col &gt;= x - range; col--){</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">                    for(int row = y - range; row &lt;= y + range; row++)</span>
+<span class="fc" id="L208">                        dots.add(new AttackDot(col, row, attackDot));</span>
+                }
+<span class="fc" id="L210">                break;</span>
+            }
+            case Right:
+            {
+<span class="fc bfc" id="L214" title="All 2 branches covered.">                for(int col = x + 1; col &lt;= x + range; col++){</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                    for(int row = y - range; row &lt;= y + range; row++)</span>
+<span class="fc" id="L216">                        dots.add(new AttackDot(col, row, attackDot));</span>
+                }
+<span class="fc" id="L218">                break;</span>
+            }
+            case Up:
+            {
+<span class="fc bfc" id="L222" title="All 2 branches covered.">                for(int row = y - 1; row &gt;= y - range; row--){</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">                    for(int col = x - range; col &lt;= x + range; col++)</span>
+<span class="fc" id="L224">                        dots.add(new AttackDot(col, row, attackDot));</span>
+                }
+<span class="fc" id="L226">                break;</span>
+            }
+            case Down:
+            {
+<span class="fc bfc" id="L230" title="All 2 branches covered.">                for(int row = y + 1; row &lt;= y + range; row++){</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">                    for(int col = x - range; col &lt;= x + range; col++)</span>
+<span class="fc" id="L232">                        dots.add(new AttackDot(col, row, attackDot));</span>
+                }
+<span class="fc" id="L234">                break;</span>
+            }
+            default:
+                break;
+        }
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">        if(dots.isEmpty())</span>
+<span class="nc" id="L240">            return false;</span>
+
+<span class="fc" id="L242">        world.addAttackDot(dots);</span>
+<span class="fc" id="L243">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 攻击起始点的x坐标
+     * @param {int} y 攻击起始点的y坐标
+     * @param {World} world 近战武器所处世界
+     * @param {AttackDot} attackDot 近战武器的攻击点
+     * @return {boolean} 攻击是否成功
+     * @description: 近战武器向圆形区域发起攻击
+     */    
+    private boolean attackFull(int x, int y, World world, AttackDot attackDot){
+<span class="fc" id="L256">        List&lt;AttackDot&gt; dots = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        for(int col = x - range; col &lt;= x + range; col++){</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">            for(int row = y - range; row &lt;= y + range; row++)</span>
+<span class="fc bfc" id="L259" title="All 4 branches covered.">                if(!(col == x &amp;&amp; row == y))</span>
+<span class="fc" id="L260">                    dots.add(new AttackDot(col, row, attackDot));</span>
+        }
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">        if(dots.isEmpty())</span>
+<span class="nc" id="L263">            return false;</span>
+
+<span class="fc" id="L265">        world.addAttackDot(dots);</span>
+<span class="fc" id="L266">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

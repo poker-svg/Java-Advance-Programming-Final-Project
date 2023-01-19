@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LaserGun.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.gun</a> &gt; <span class="el_source">LaserGun.java</span></div><h1>LaserGun.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 17:36:27
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为激光枪类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\gun\LaserGun.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.gun;
+
+import cn.edu.nju.cs.game.world.weapon.WeaponFactory;
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.creature.Direction;
+import cn.edu.nju.cs.game.world.item.Tile;
+
+public class LaserGun extends Gun{
+    public static final int RANGE = 8;
+    public static final String NAME = &quot;LaserGun&quot;;
+<span class="fc" id="L37">    public static final Tile IMAGE = Tile.LASER_GUN;</span>
+    public static final int ATTACK_VALUE = 35;
+    public static final int COLDING_INTERVAL = 1000;
+    public static final int MAX_ENERGY = 5;
+    public static final int ADD_BULLET_INTERVAL = 2000;
+    public static final int MAX_BULLET_AMOUNT = 5;
+
+    /**
+     * @author: Xu YangXin
+     * @param {WeaponFactory} factory 生产此激光枪的武器工厂
+     * @param {LaserBean} laserBeam 激光枪的激光子弹
+     * @return {*}
+     * @description: 构造器，激光枪的子弹必须是激光
+     */    
+    public LaserGun(WeaponFactory factory, LaserBeam laserBeam){
+<span class="fc" id="L52">        super(factory, LaserGun.NAME, LaserGun.IMAGE, LaserGun.ATTACK_VALUE,</span>
+            LaserGun.RANGE, LaserGun.COLDING_INTERVAL, LaserGun.MAX_ENERGY,
+            LaserGun.ADD_BULLET_INTERVAL, LaserGun.MAX_BULLET_AMOUNT, laserBeam);
+<span class="fc" id="L55">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 激光枪的普攻是否成功
+     * @description: 激光枪的普攻，向玩家面向的方向射出一道激光
+     */    
+    public boolean attack(){
+<span class="pc bpc" id="L64" title="1 of 4 branches missed.">        if(!this.isActive() ||          // 枪处于冷却周期中</span>
+            this.remainingBullet &lt;= 0)  // 子弹不足
+<span class="fc" id="L66">            return false;               // 攻击失败</span>
+
+<span class="fc" id="L68">        this.remainingBullet--;</span>
+
+<span class="fc" id="L70">        Creature master = this.factory().master();</span>
+<span class="fc" id="L71">        int x = master.x(), y = master.y();</span>
+<span class="fc" id="L72">        Direction direction = master.direction();</span>
+<span class="pc bpc" id="L73" title="1 of 5 branches missed.">        switch (direction) {</span>
+            case Left:
+<span class="fc" id="L75">                x--;</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                for(int i = x; i &gt;= x-this.range; i--)</span>
+<span class="fc" id="L77">                    master.world().addBullet(</span>
+<span class="fc" id="L78">                        new LaserBeam(i, y, direction, this.factory().master())</span>
+                    );
+<span class="fc" id="L80">                break;</span>
+            case Right:
+<span class="fc" id="L82">                x++;</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">                for(int i = x; i &lt;= x+this.range; i++)</span>
+<span class="fc" id="L84">                    master.world().addBullet(</span>
+<span class="fc" id="L85">                        new LaserBeam(i, y, direction, this.factory().master())</span>
+                    );
+<span class="fc" id="L87">                break;</span>
+            case Up:
+<span class="fc" id="L89">                y--;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">                for(int j = y; j &gt;= y-this.range; j--)</span>
+<span class="fc" id="L91">                    master.world().addBullet(</span>
+<span class="fc" id="L92">                        new LaserBeam(x, j, direction, this.factory().master())</span>
+                    );
+<span class="fc" id="L94">                break;</span>
+            case Down:
+<span class="fc" id="L96">                y++;</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">                for(int j = y; j &lt;= y+this.range; j++)</span>
+<span class="fc" id="L98">                    master.world().addBullet(</span>
+<span class="fc" id="L99">                        new LaserBeam(x, j, direction, this.factory().master())</span>
+                    );
+<span class="fc" id="L101">                break;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L106">        return true;</span>
+    }
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 激光枪的大招是否成功
+     * @description: 激光枪发射大招，三道激光
+     */    
+    public boolean bigAttack(){
+<span class="pc bpc" id="L116" title="1 of 6 branches missed.">        if(!this.isActive() ||              // 枪处于冷却周期中</span>
+            this.remainingBullet &lt;= 0 ||    // 子弹不足
+            this.curEnergy &lt; this.maxEnergy)// 能量不足
+<span class="fc" id="L119">        return false;                       // 攻击失败</span>
+
+<span class="fc" id="L121">    this.remainingBullet--;</span>
+
+<span class="fc" id="L123">    Creature master = this.factory().master();</span>
+<span class="fc" id="L124">    int x = master.x(), y = master.y();</span>
+<span class="fc" id="L125">    Direction direction = master.direction();</span>
+<span class="pc bpc" id="L126" title="4 of 5 branches missed.">    switch (direction) {</span>
+        case Left:
+<span class="nc" id="L128">            x--;</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">            for(int i = x; i &gt;= x-this.range; i--){</span>
+<span class="nc" id="L130">                master.world().addBullet(</span>
+<span class="nc" id="L131">                    new LaserBeam(i, y, direction, this.factory().master())</span>
+                );
+<span class="nc" id="L133">                master.world().addBullet(</span>
+<span class="nc" id="L134">                    new LaserBeam(i, y-1, direction, this.factory().master())</span>
+                );
+<span class="nc" id="L136">                master.world().addBullet(</span>
+<span class="nc" id="L137">                    new LaserBeam(i, y+1, direction, this.factory().master())</span>
+                );
+            }
+<span class="nc" id="L140">            break;</span>
+        case Right:
+<span class="fc" id="L142">            x++;</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">            for(int i = x; i &lt;= x+this.range; i++){</span>
+<span class="fc" id="L144">                master.world().addBullet(</span>
+<span class="fc" id="L145">                    new LaserBeam(i, y, direction, this.factory().master())</span>
+                );
+<span class="fc" id="L147">                master.world().addBullet(</span>
+<span class="fc" id="L148">                    new LaserBeam(i, y-1, direction, this.factory().master())</span>
+                );
+<span class="fc" id="L150">                master.world().addBullet(</span>
+<span class="fc" id="L151">                    new LaserBeam(i, y+1, direction, this.factory().master())</span>
+                );
+            }
+<span class="fc" id="L154">            break;</span>
+        case Up:
+<span class="nc" id="L156">            y--;</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">            for(int j = y; j &gt;= y-this.range; j--){</span>
+<span class="nc" id="L158">                master.world().addBullet(</span>
+<span class="nc" id="L159">                    new LaserBeam(x, j, direction, this.factory().master())</span>
+                );
+<span class="nc" id="L161">                master.world().addBullet(</span>
+<span class="nc" id="L162">                    new LaserBeam(x-1, j, direction, this.factory().master())</span>
+                );
+<span class="nc" id="L164">                master.world().addBullet(</span>
+<span class="nc" id="L165">                    new LaserBeam(x+1, j, direction, this.factory().master())</span>
+                );
+            }
+<span class="nc" id="L168">            break;</span>
+        case Down:
+<span class="nc" id="L170">            y++;</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">            for(int j = y; j &lt;= y+this.range; j++){</span>
+<span class="nc" id="L172">                master.world().addBullet(</span>
+<span class="nc" id="L173">                    new LaserBeam(x, j, direction, this.factory().master())</span>
+                );
+<span class="nc" id="L175">                master.world().addBullet(</span>
+<span class="nc" id="L176">                    new LaserBeam(x-1, j, direction, this.factory().master())</span>
+                );
+<span class="nc" id="L178">                master.world().addBullet(</span>
+<span class="nc" id="L179">                    new LaserBeam(x+1, j, direction, this.factory().master())</span>
+                );
+            }
+<span class="nc" id="L182">            break;</span>
+        default:
+            break;
+    }
+
+<span class="fc" id="L187">    return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

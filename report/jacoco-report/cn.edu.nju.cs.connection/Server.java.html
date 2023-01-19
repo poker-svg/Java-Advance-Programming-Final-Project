@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Server.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.connection</a> &gt; <span class="el_source">Server.java</span></div><h1>Server.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2023-01-09 10:27:11
+ * @LastEditTime: 2023-01-16 13:18:57
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为游戏的服务器类，网络地址是localhost:7070
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\connection\Server.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.connection;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.ServerSocketChannel;
+
+import cn.edu.nju.cs.game.asciiPanel.AsciiFont;
+import cn.edu.nju.cs.game.asciiPanel.AsciiPanel;
+import cn.edu.nju.cs.game.screen.PlayScreen;
+import cn.edu.nju.cs.game.world.creature.bros.Player;
+
+public class Server {
+    //Server端口号
+    public static final int SERVER_PORT = 7070;
+
+    //房间号和对应游戏界面的映射
+    private Map&lt;Integer, Room&gt; rooms;
+    private Timer checkTimer;
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L56">    public Server(){</span>
+<span class="fc" id="L57">        this.rooms = new ConcurrentHashMap&lt;Integer, Room&gt;();</span>
+<span class="fc" id="L58">        this.checkTimer = new Timer();</span>
+<span class="fc" id="L59">        this.checkTimer.schedule(</span>
+<span class="fc" id="L60">            new TimerTask() {</span>
+                public void run() {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">                    for (Map.Entry&lt;Integer, Room&gt; entry : rooms.entrySet()) {</span>
+<span class="fc" id="L63">                        int roomAddr = entry.getKey();</span>
+<span class="fc" id="L64">                        Room room = entry.getValue();</span>
+<span class="fc" id="L65">                        PlayScreen playScreen = room.playScreen;</span>
+<span class="fc" id="L66">                        Timer timer = room.refreshTimer;</span>
+
+<span class="pc bpc" id="L68" title="1 of 4 branches missed.">                        if(playScreen != null &amp;&amp; playScreen.world().getPlayers().size() &lt; 1){</span>
+<span class="fc" id="L69">                            deleteRoom(roomAddr);</span>
+<span class="fc" id="L70">                            timer.cancel();</span>
+                        }
+<span class="fc" id="L72">                    }</span>
+
+<span class="fc" id="L74">                }</span>
+            }, 400 , 400);
+<span class="fc" id="L76">    }</span>
+
+    public class Room{
+        public PlayScreen playScreen;
+        public AsciiPanel terminal;
+        public Timer refreshTimer;
+<span class="fc" id="L82">        public Room(PlayScreen playScreen){</span>
+<span class="fc" id="L83">            this.playScreen = playScreen;</span>
+            // this.playScreen.setPlayer(null);
+<span class="fc" id="L85">            this.playScreen.musicStuff().stop();</span>
+<span class="fc" id="L86">            this.terminal = new AsciiPanel(100, 50, AsciiFont.KENNEY_1BIT_PACK_17_17);</span>
+<span class="fc" id="L87">            this.refreshTimer = new Timer();</span>
+            // 周期性刷新界面,100ms
+
+<span class="fc" id="L90">            this.refreshTimer.schedule(</span>
+<span class="fc" id="L91">                new TimerTask() {</span>
+                    public void run() {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">                        if(playScreen.world().getPlayers().size() &lt; 1)</span>
+<span class="nc" id="L94">                            return;</span>
+
+<span class="fc" id="L96">                        terminal.clear();</span>
+<span class="fc" id="L97">                        playScreen.displayOutput(terminal);</span>
+
+<span class="fc bfc" id="L99" title="All 2 branches covered.">                        for(Player player : playScreen.world().getPlayers()){</span>
+<span class="fc" id="L100">                            List&lt;String&gt; messages = player.messages();</span>
+<span class="fc" id="L101">                            List&lt;String&gt; oldMessages = player.oldMessages();</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">                            if(!messages.isEmpty()){</span>
+<span class="nc" id="L103">                                oldMessages.clear();</span>
+<span class="nc" id="L104">                                oldMessages.addAll(messages);</span>
+<span class="nc" id="L105">                                messages.clear();</span>
+                            }
+<span class="fc" id="L107">                        }</span>
+<span class="fc" id="L108">                    }</span>
+                }, 100 , 100);
+<span class="fc" id="L110">        }</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} roomAddress 房间地址
+     * @return {PlayScreen} 得到的房间
+     * @description: 根据房间地址搜索服务器上的房间
+     */    
+    public PlayScreen getPlayScreen(int roomAddress){
+<span class="fc" id="L120">        Room room = this.rooms.get(roomAddress);</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if(room == null)</span>
+<span class="fc" id="L122">            return null;</span>
+<span class="fc" id="L123">        return room.playScreen;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} roomAddress 房间地址
+     * @param {PlayScreen} playScreen 对应的房间
+     * @return {*}
+     * @description: 将房间地址和房间的映射保存到服务器上
+     */
+    public void addRoom(int roomAddress, PlayScreen playScreen){
+<span class="fc" id="L134">        this.rooms.put(roomAddress, new Room(playScreen));</span>
+<span class="fc" id="L135">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} roomAddress 房间地址
+     * @return {*}
+     * @description: 删除服务器上的房间地址对应的目标房间
+     */    
+    public boolean deleteRoom(int roomAddress){
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">        return this.rooms.remove(roomAddress) != null;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} port 端口号
+     * @return {*}
+     * @throws Exception
+     * @description: 在某个端口号上启动响应器
+     */    
+    public void startReactor(int port) throws Exception {
+
+<span class="fc" id="L156">        ServerSocketChannel server = ServerSocketChannel.open();</span>
+<span class="fc" id="L157">        server.socket().bind(new InetSocketAddress(port));</span>
+<span class="fc" id="L158">        server.configureBlocking(false);</span>
+
+<span class="fc" id="L160">        Reactor reactor = new Reactor();</span>
+<span class="fc" id="L161">        reactor.registerChannel(SelectionKey.OP_ACCEPT, server);</span>
+
+        //对reactor注册对应时间的处理器
+<span class="fc" id="L164">        reactor.registerEventHandler(</span>
+                SelectionKey.OP_ACCEPT, new AcceptEventHandler(
+<span class="fc" id="L166">                reactor.getDemultiplexer(), this));</span>
+
+<span class="fc" id="L168">        reactor.registerEventHandler(</span>
+                SelectionKey.OP_READ, new ReadEventHandler(
+<span class="fc" id="L170">                reactor.getDemultiplexer(), this));</span>
+
+<span class="fc" id="L172">        reactor.registerEventHandler(</span>
+                SelectionKey.OP_WRITE, new WriteEventHandler(
+<span class="fc" id="L174">                reactor.getDemultiplexer(), this));</span>
+
+        //启动无限循环的服务器运行
+<span class="nc" id="L177">        reactor.run(); // Run the dispatcher loop</span>
+
+<span class="nc" id="L179">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L182">        System.out.println(&quot;Server Started at port : &quot; + SERVER_PORT);</span>
+        try {
+<span class="nc" id="L184">            new Server().startReactor(SERVER_PORT);</span>
+<span class="nc" id="L185">        } catch (Exception e) {</span>
+<span class="nc" id="L186">            e.printStackTrace();</span>
+<span class="nc" id="L187">        }</span>
+<span class="nc" id="L188">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

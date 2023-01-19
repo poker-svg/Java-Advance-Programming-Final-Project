@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttackDot.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.melee</a> &gt; <span class="el_source">AttackDot.java</span></div><h1>AttackDot.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 17:58:59
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为攻击点类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\melee\AttackDot.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.melee;
+
+import cn.edu.nju.cs.game.world.item.Tile;
+
+import java.io.Serializable;
+
+import cn.edu.nju.cs.game.world.creature.Creature;
+
+public class AttackDot implements Serializable {
+    private int x; // 攻击点坐标x
+    private int y; // 攻击点坐标y
+    private int attackValue; // 攻击点攻击力
+    private Tile image; // 攻击点图案
+    private int remainTime; // 存在的时间长度
+    private Creature master; // 攻击点的主人
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 攻击点的x坐标
+     * @description: 获取攻击点的x坐标
+     */
+    public int x() {
+<span class="fc" id="L49">        return this.x;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 攻击点的x坐标
+     * @return {*}
+     * @description: 设置攻击点的x坐标
+     */    
+    public void setX(int x) {
+<span class="nc" id="L59">        this.x = x;</span>
+<span class="nc" id="L60">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 攻击点的y坐标
+     * @description: 获取攻击点的y坐标
+     */
+    public int y() {
+<span class="fc" id="L68">        return this.y;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} y 攻击点的y坐标
+     * @return {*}
+     * @description: 设置攻击点的y坐标
+     */    
+    public void setY(int y) {
+<span class="nc" id="L78">        this.y = y;</span>
+<span class="nc" id="L79">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 攻击点的攻击力
+     * @description: 获取攻击点的攻击力
+     */    
+    public int attackValue() {
+<span class="fc" id="L87">        return this.attackValue;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 攻击点的攻击力提升20%
+     */
+    public void attackUpgrade(){
+<span class="nc" id="L96">        this.attackValue = (int)(this.attackValue*1.2);</span>
+<span class="nc" id="L97">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Tile} 攻击点的图像
+     * @description: 获取攻击点的图像
+     */    
+    public Tile image() {
+<span class="fc" id="L105">        return this.image;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 攻击点残存时间
+     * @description: 获取攻击点的残存时间
+     */    
+    public int remainTime(){
+<span class="fc" id="L114">        return this.remainTime;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Creature} 攻击点的主人
+     * @description: 获取攻击点的主人
+     */    
+    public Creature master(){
+<span class="fc" id="L123">        return this.master;</span>
+    }
+
+    // 通过此构造函数创造的攻击点都是样点，用于以后近战武器攻击时产生的攻击点的复制
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 攻击点的x坐标
+     * @param {int} y 攻击点的y坐标
+     * @param {int} attackValue 攻击点的攻击力
+     * @param {Tile} image 攻击点的图像
+     * @param {int} remainTime 攻击点的残存时间
+     * @param {Creature} master 攻击点的主人
+     * @return {*}
+     * @description: 攻击点的构造器
+     */
+<span class="fc" id="L138">    public AttackDot(int x, int y, int attackValue, Tile image, int remainTime, Creature master) {</span>
+<span class="fc" id="L139">        this.x = x;</span>
+<span class="fc" id="L140">        this.y = y;</span>
+<span class="fc" id="L141">        this.attackValue = attackValue;</span>
+<span class="fc" id="L142">        this.image = image;</span>
+<span class="fc" id="L143">        this.remainTime = remainTime;</span>
+<span class="fc" id="L144">        this.master = master;</span>
+<span class="fc" id="L145">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 攻击点的x坐标
+     * @param {int} y 攻击点的y坐标
+     * @param {AttackDot} attackDot 攻击点的目标模板
+     * @return {*}
+     * @description: 攻击点的复制构造器
+     */    
+<span class="fc" id="L155">    public AttackDot(int x, int y, AttackDot attackDot) {</span>
+<span class="fc" id="L156">        this.x = x;</span>
+<span class="fc" id="L157">        this.y = y;</span>
+<span class="fc" id="L158">        this.attackValue = attackDot.attackValue();</span>
+<span class="fc" id="L159">        this.image = attackDot.image();</span>
+<span class="fc" id="L160">        this.remainTime = attackDot.remainTime();</span>
+<span class="fc" id="L161">        this.master = attackDot.master();</span>
+<span class="fc" id="L162">    }</span>
+
+    public boolean attack(Creature creature){
+<span class="pc bpc" id="L165" title="1 of 4 branches missed.">        if(this.x != creature.x() || this.y != creature.y())</span>
+<span class="fc" id="L166">            return false;</span>
+
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        if(this.master == creature)</span>
+<span class="nc" id="L169">            return false;</span>
+
+<span class="nc" id="L171">        int damage = Math.max(0, this.attackValue - creature.defenseValue());</span>
+<span class="nc" id="L172">        damage = (int) ((Math.random()+1) * damage) + 1; // 1-2倍暴击率</span>
+
+<span class="nc" id="L174">        creature.modifyHP(-damage);</span>
+<span class="nc" id="L175">        this.master.chargeEnergy();</span>
+<span class="nc" id="L176">        creature.notify(&quot;The '%s' attacks you for %d damage.&quot;, this.image().glyph(), damage);</span>
+<span class="nc" id="L177">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BombGlove.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.bomb</a> &gt; <span class="el_source">BombGlove.java</span></div><h1>BombGlove.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 16:56:37
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为炸弹手套类，是可移动炸弹的近战武器
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\bomb\BombGlove.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.bomb;
+
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.creature.Direction;
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.weapon.Weapon;
+import cn.edu.nju.cs.game.world.weapon.WeaponFactory;
+
+public class BombGlove extends Weapon{
+    public static final String NAME = &quot;BombGlove&quot;;
+<span class="fc" id="L37">    public static final Tile IMAGE = Tile.BOMB_GLOVE;</span>
+    public static final int ATTACK_VALUE = 0;
+    public static final int RANGE = 0;
+    public static final int COLDING_INTERVAL = 3000;
+    public static final int MAX_ENERGY = 3;
+
+    /**
+     * @author: Xu YangXin
+     * @param {WeaponFactory} factory 生成此炸弹手套的武器工厂
+     * @return {*}
+     * @description: 构造器
+     */    
+    public BombGlove(WeaponFactory factory){
+<span class="fc" id="L50">        super(factory, BombGlove.NAME, BombGlove.IMAGE, BombGlove.ATTACK_VALUE,</span>
+            BombGlove.RANGE, BombGlove.COLDING_INTERVAL, BombGlove.MAX_ENERGY);
+<span class="fc" id="L52">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 攻击是否成功
+     * @description: 炸弹手套的普攻 —— 推炸弹
+     */    
+    public boolean attack() {
+<span class="fc" id="L61">        Creature master = this.factory().master();</span>
+<span class="fc" id="L62">        int x = master.x(), y = master.y();</span>
+<span class="fc" id="L63">        Direction direction = master.direction();</span>
+<span class="pc bpc" id="L64" title="1 of 5 branches missed.">        switch (direction) {</span>
+<span class="fc" id="L65">            case Left:  x--; break;</span>
+<span class="fc" id="L66">            case Right: x++; break;</span>
+<span class="fc" id="L67">            case Up:    y--; break;</span>
+<span class="fc" id="L68">            case Down:  y++; break;</span>
+            default:         break;
+        }
+<span class="fc" id="L71">        Bomb targetBomb = master.world().getBomb(x, y); // 要推的目标炸弹</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if(targetBomb == null)</span>
+<span class="fc" id="L73">            return false;</span>
+<span class="fc" id="L74">        targetBomb.startMove(direction);</span>
+<span class="fc" id="L75">        return true;</span>
+    }
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 大招是否成功释放
+     * @description: 炸弹手套的大招 —— 和普攻一样
+     */    
+    public boolean bigAttack(){
+<span class="fc" id="L85">        return this.attack();</span>
+    }
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 炸弹手套的武器升级，没啥用
+     */    
+    public void attackUpgrade(){
+
+<span class="nc" id="L96">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

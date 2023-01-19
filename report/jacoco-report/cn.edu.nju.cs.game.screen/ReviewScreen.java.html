@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReviewScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.screen</a> &gt; <span class="el_source">ReviewScreen.java</span></div><h1>ReviewScreen.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-12-06 15:00:22
+ * @LastEditTime: 2023-01-16 16:11:47
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为观看本地录制内容的回顾界面
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\screen\ReviewScreen.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.screen;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.awt.event.KeyEvent;
+
+import cn.edu.nju.cs.game.asciiPanel.AsciiPanel;
+import cn.edu.nju.cs.logger.Recorder;
+
+public class ReviewScreen implements Screen{
+    Iterator&lt;PlayScreen&gt; iter;
+    Recorder recorder;
+    StartScreen backStartScreen;
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} recordName 记录文件名
+     * @param {StartScreen} backStartScreen 返回的启动界面
+     * @return {*}
+     * @description: 构造器
+     */
+<span class="fc" id="L48">    public ReviewScreen(String recordName, StartScreen backStartScreen){</span>
+        try{
+<span class="nc" id="L50">            this.recorder = Recorder.readRecorder(recordName);</span>
+<span class="fc" id="L51">        } catch (IOException e) {</span>
+<span class="fc" id="L52">            e.printStackTrace();</span>
+<span class="nc" id="L53">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L54">            e.printStackTrace();</span>
+<span class="pc" id="L55">        }</span>
+
+<span class="nc" id="L57">        this.iter = this.recorder.playScreens().iterator();</span>
+<span class="nc" id="L58">        this.backStartScreen = backStartScreen;</span>
+<span class="nc" id="L59">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @return {*}
+     * @description: 按帧展示记录文件的内容
+     */    
+    public void displayOutput(AsciiPanel terminal){
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if(iter.hasNext()) {</span>
+<span class="nc" id="L70">            PlayScreen playScreen = (PlayScreen)iter.next();</span>
+<span class="nc" id="L71">            playScreen.resetAllAI();</span>
+<span class="nc" id="L72">            playScreen.displayTiles(terminal, playScreen.getScrollX(), playScreen.getScrollY());</span>
+<span class="nc" id="L73">            playScreen.displayPlayerInfo(terminal);</span>
+<span class="nc" id="L74">            playScreen.displayCurWeaponInfo(terminal);</span>
+<span class="nc" id="L75">            playScreen.displayMessages(terminal, playScreen.messages());</span>
+        }
+<span class="nc" id="L77">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {*}
+     * @description: 响应玩家的键盘操作
+     */    
+    public Screen respondToUserInput(KeyEvent key){
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        if(key.getKeyCode() == KeyEvent.VK_ESCAPE)</span>
+<span class="nc" id="L88">            return this.backStartScreen;</span>
+<span class="nc" id="L89">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

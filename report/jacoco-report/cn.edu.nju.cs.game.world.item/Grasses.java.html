@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Grasses.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.item</a> &gt; <span class="el_source">Grasses.java</span></div><h1>Grasses.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 18:04:45
+ * @LastEditors: Xu YangXin
+ * @Description: 此类代表世界中的草丛地形，可隐藏生物
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\item\Grasses.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.item;
+
+import java.util.List;
+
+import cn.edu.nju.cs.game.world.creature.Creature;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Grasses implements Serializable{
+    private int width,height;
+    private List&lt;Grass&gt; grasses;
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} width 世界宽度
+     * @param {int} height 世界高度
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L47">    public Grasses(int width, int height){</span>
+<span class="fc" id="L48">        this.width = width;</span>
+<span class="fc" id="L49">        this.height = height;</span>
+<span class="fc" id="L50">        this.grasses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L51">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Grass&gt;} 草丛列表
+     * @description: 获取所有草丛的列表
+     */    
+    public List&lt;Grass&gt; grassesList(){
+<span class="fc" id="L59">        return this.grasses;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {Grasses.Grass} 搜索结果
+     * @description: 根据坐标搜索目标草丛，找不到则返回null
+     */    
+    public Grasses.Grass search(int x, int y){
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        for(Grass grass : grasses)</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">            if(grass.equal(x, y))</span>
+<span class="nc" id="L72">                return grass;</span>
+<span class="fc" id="L73">        return null;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @param {Tile} image 草丛的图像
+     * @return {boolean} 添加是否成功
+     * @description: 在世界的某一坐标添加草丛
+     */    
+    public boolean addGrass(int x, int y, Tile image){
+<span class="pc bpc" id="L85" title="3 of 8 branches missed.">        if (x &lt; 0 || x &gt;= width || y &lt; 0 || y &gt;= height)</span>
+<span class="fc" id="L86">            return false;</span>
+<span class="fc" id="L87">        grasses.add(new Grasses.Grass(x, y, image));</span>
+<span class="fc" id="L88">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} creature 目标生物
+     * @return {boolean} 隐藏是否成功
+     * @description: 将某一生物隐藏
+     */    
+    public boolean hideCreature(Creature creature){
+<span class="fc" id="L98">        creature.expose();</span>
+
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        switch (creature.world().tile(creature.x(), creature.y())) {</span>
+            case GRASS_1:
+            case GRASS_2:
+            case GRASS_3:
+            case GRASS_4:
+            case GRASS_5: // 一堆草地
+            case GRASS_6:
+            case GRASS_7:
+            case GRASS_8:
+            case GRASS_9:
+            case GRASS_10:
+            case GRASS_11:
+<span class="fc" id="L112">                creature.hide();</span>
+<span class="fc" id="L113">                return true;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L118">        return false;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {World} world
+     * @return {*}
+     * @description: 刷新草丛
+     */    
+    public void refreshGrasses(World world){
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        for(Grass grass : world.grasses().grassesList()){</span>
+<span class="fc" id="L129">            world.setThing(grass.image(), grass.x(), grass.y());</span>
+<span class="fc" id="L130">        }</span>
+<span class="fc" id="L131">    }</span>
+
+    public class Grass implements Serializable{
+        private int x, y;
+<span class="fc" id="L135">        public int x(){ return this.x; }</span>
+<span class="fc" id="L136">        public int y(){ return this.y; }</span>
+
+        private Tile image;
+        public Tile image(){
+<span class="fc" id="L140">            return this.image;</span>
+        }
+
+<span class="fc" id="L143">        public Grass(int x, int y, Tile image){</span>
+<span class="fc" id="L144">            this.x = x;</span>
+<span class="fc" id="L145">            this.y = y;</span>
+<span class="fc" id="L146">            this.image = image;</span>
+<span class="fc" id="L147">        }</span>
+
+        public boolean equal(int x, int y){
+<span class="pc bpc" id="L150" title="1 of 4 branches missed.">            return this.x == x &amp;&amp; this.y == y;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

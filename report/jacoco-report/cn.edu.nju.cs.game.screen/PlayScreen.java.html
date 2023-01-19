@@ -1,0 +1,1077 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlayScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.screen</a> &gt; <span class="el_source">PlayScreen.java</span></div><h1>PlayScreen.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2023-01-09 10:34:44
+ * @LastEditTime: 2023-01-16 16:05:19
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为进行游戏交互的游戏界面类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\screen\PlayScreen.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.screen;
+
+import cn.edu.nju.cs.game.asciiPanel.AsciiPanel;
+
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.edu.nju.cs.game.world.item.World;
+import cn.edu.nju.cs.game.world.item.WorldBuilder;
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.creature.AppleAI;
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.creature.bros.Player;
+import cn.edu.nju.cs.game.world.creature.goblins.Goblin;
+import cn.edu.nju.cs.game.world.creature.CreatureFactory;
+import cn.edu.nju.cs.game.world.creature.Direction;
+import cn.edu.nju.cs.game.world.creature.PlayerAI;
+import cn.edu.nju.cs.game.world.weapon.Weapon;
+import cn.edu.nju.cs.game.world.weapon.gun.*;
+import cn.edu.nju.cs.game.world.weapon.melee.AttackDot;
+import cn.edu.nju.cs.game.world.weapon.melee.Torch;
+import cn.edu.nju.cs.game.world.weapon.throwable.ThrowableItem;
+import cn.edu.nju.cs.game.world.weapon.throwable.ThrowableWeapon;
+import cn.edu.nju.cs.logger.Recorder;
+import cn.edu.nju.cs.music.MusicStuff;
+import cn.edu.nju.cs.game.world.weapon.bomb.Bomb;
+import cn.edu.nju.cs.game.world.weapon.bomb.BombGlove;
+
+public class PlayScreen implements Screen, Serializable {
+    private World world;
+    private WorldBuilder worldBuilder;
+    private Player player;
+    private int screenWidth;
+    private int screenHeight;
+    private List&lt;String&gt; messages;
+    private List&lt;String&gt; oldMessages;
+    private String playScreenAddress;
+    private String musicName;
+    private boolean recordFlag;
+    transient private MusicStuff musicStuff;
+    transient private CreatureFactory creatureFactory;
+    transient private Recorder recorder;
+    public static final int GOBLIN_SIZE = 5;
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} roomAddr 房间地址
+     * @param {String} musicName 音乐名称
+     * @param {String} mapName 地图名称
+     * @return {*}
+     * @description: 构造器
+     */
+<span class="fc" id="L82">    public PlayScreen(String roomAddr, String musicName, String mapName) {</span>
+        // this.screenWidth = 80;
+        // this.screenHeight = 24;
+        // this.worldBuilder = new WorldBuilder(90, 31);
+<span class="fc" id="L86">        this.screenWidth = 60;</span>
+<span class="fc" id="L87">        this.screenHeight = 24;</span>
+<span class="fc" id="L88">        this.worldBuilder = new WorldBuilder(60, 31);</span>
+<span class="fc" id="L89">        loadWorld(mapName);</span>
+<span class="fc" id="L90">        this.messages = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L91">        this.oldMessages = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L92">        this.playScreenAddress = roomAddr;</span>
+<span class="fc" id="L93">        this.musicName = musicName;</span>
+<span class="fc" id="L94">        this.creatureFactory = new CreatureFactory(this.world, PlayScreen.GOBLIN_SIZE);</span>
+<span class="fc" id="L95">        createCreatures(creatureFactory);</span>
+<span class="fc" id="L96">        this.recorder = new Recorder();</span>
+<span class="fc" id="L97">        this.recordFlag = false; // 一开始没有录制</span>
+        // 放音乐
+<span class="fc" id="L99">        musicStuff = new MusicStuff();</span>
+<span class="fc" id="L100">        musicStuff.playMusic(&quot;./src/main/resources/&quot;+ musicName + &quot;.wav&quot;);</span>
+<span class="fc" id="L101">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {PlayScreen} otherPlayScreen 另外一个游戏界面
+     * @return {*}
+     * @description: 复制构造器，用于重启本地保存或者网络传输的游戏界面(房间)
+     */
+<span class="fc" id="L109">    public PlayScreen(PlayScreen otherPlayScreen){</span>
+<span class="fc" id="L110">        this.world = otherPlayScreen.world;</span>
+<span class="fc" id="L111">        this.world.resetWorld();</span>
+<span class="fc" id="L112">        this.worldBuilder = otherPlayScreen.worldBuilder;</span>
+<span class="fc" id="L113">        this.player = otherPlayScreen.player;</span>
+<span class="fc" id="L114">        this.screenWidth = otherPlayScreen.screenWidth;</span>
+<span class="fc" id="L115">        this.screenHeight = otherPlayScreen.screenHeight;</span>
+<span class="fc" id="L116">        this.messages = otherPlayScreen.messages;</span>
+<span class="fc" id="L117">        this.oldMessages = otherPlayScreen.oldMessages;</span>
+<span class="fc" id="L118">        this.playScreenAddress = otherPlayScreen.playScreenAddress;</span>
+<span class="fc" id="L119">        this.musicName = otherPlayScreen.musicName;</span>
+<span class="fc" id="L120">        this.musicStuff = new MusicStuff();</span>
+<span class="fc" id="L121">        musicStuff.playMusic(&quot;./src/main/resources/&quot;+ musicName + &quot;.wav&quot;);</span>
+
+<span class="fc" id="L123">        this.resetAllAI();</span>
+
+<span class="fc" id="L125">        this.creatureFactory = new CreatureFactory(this.world, PlayScreen.GOBLIN_SIZE);</span>
+<span class="fc" id="L126">        creatureFactory.enableGoblinsStartMove();</span>
+<span class="fc" id="L127">        this.recorder = new Recorder();</span>
+<span class="fc" id="L128">        this.recordFlag = false;</span>
+<span class="fc" id="L129">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 重新设置所有生物的AI
+     */    
+    public void resetAllAI(){
+        // 设置AI
+        // 妖精
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        for(Goblin goblin : this.world.getGoblins())</span>
+<span class="fc" id="L140">            new PlayerAI(goblin, new ArrayList&lt;String&gt;());</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        for(Player player : this.world.getPlayers())</span>
+<span class="fc" id="L142">            new PlayerAI(player, player.messages());</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        for(Creature apple : this.world.getCreatures()){</span>
+<span class="fc bfc" id="L144" title="All 4 branches covered.">            if(! ((apple instanceof Goblin)||(apple instanceof Player)) ){</span>
+<span class="fc" id="L145">                new AppleAI(apple, this.creatureFactory);</span>
+            }
+<span class="fc" id="L147">        }</span>
+<span class="fc" id="L148">        new PlayerAI(this.player, this.messages);</span>
+<span class="fc" id="L149">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @return {*}
+     * @description: 展示游戏界面
+     */    
+    public void displayOutput(AsciiPanel terminal) {
+        // Terrain , creatures , bombs , bullet
+<span class="fc" id="L160">        displayTiles(terminal, getScrollX(), getScrollY());</span>
+
+        // Player
+        //terminal.write(player.glyph(), player.x() - getScrollX(), player.y() - getScrollY(), player.color());
+
+        // PlayerInfo
+<span class="fc" id="L166">        displayPlayerInfo(terminal);</span>
+
+        // Current Weapon
+<span class="fc" id="L169">        displayCurWeaponInfo(terminal);</span>
+
+        // Messages
+<span class="fc" id="L172">        displayMessages(terminal, this.messages);</span>
+
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        for(Player player : this.world.getPlayers())</span>
+<span class="fc" id="L175">            this.world.firePiles().warmCreature(player);</span>
+
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">        if(this.recordFlag)</span>
+<span class="nc" id="L178">            this.recorder.saveSnapShot(this);</span>
+<span class="fc" id="L179">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的键
+     * @return {*}
+     * @description: 响应玩家的按键
+     */    
+    public Screen respondToUserInput(KeyEvent key) {
+<span class="pc bpc" id="L189" title="3 of 4 branches missed.">        if(world.worldIsPaused() &amp;&amp; key.getKeyCode() != KeyEvent.VK_ESCAPE)</span>
+<span class="nc" id="L190">            return this;</span>
+<span class="pc bpc" id="L191" title="9 of 14 branches missed.">        switch (key.getKeyCode()) {</span>
+            case KeyEvent.VK_LEFT:
+<span class="fc" id="L193">                player.setDirection(Direction.Left);</span>
+                try {
+<span class="fc" id="L195">                    Weapon weapon = player.weaponFactory().curWeapon();</span>
+<span class="pc bpc" id="L196" title="3 of 4 branches missed.">                    if(weapon instanceof BombGlove &amp;&amp; weapon.attack())</span>
+<span class="nc" id="L197">                        weapon.setActive(false);</span>
+<span class="nc" id="L198">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L199">                    e.printStackTrace();</span>
+<span class="fc" id="L200">                }</span>
+<span class="fc" id="L201">                player.moveBy(-1, 0);</span>
+<span class="fc" id="L202">                break;</span>
+            case KeyEvent.VK_RIGHT:
+<span class="fc" id="L204">                player.setDirection(Direction.Right);</span>
+                try {
+<span class="fc" id="L206">                    Weapon weapon = player.weaponFactory().curWeapon();</span>
+<span class="pc bpc" id="L207" title="3 of 4 branches missed.">                    if(weapon instanceof BombGlove &amp;&amp; weapon.attack())</span>
+<span class="nc" id="L208">                        weapon.setActive(false);</span>
+<span class="nc" id="L209">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L210">                    e.printStackTrace();</span>
+<span class="fc" id="L211">                }</span>
+<span class="fc" id="L212">                player.moveBy(1, 0);</span>
+<span class="fc" id="L213">                break;</span>
+            case KeyEvent.VK_UP:
+<span class="fc" id="L215">                player.setDirection(Direction.Up);</span>
+                try {
+<span class="fc" id="L217">                    Weapon weapon = player.weaponFactory().curWeapon();</span>
+<span class="pc bpc" id="L218" title="3 of 4 branches missed.">                    if(weapon instanceof BombGlove &amp;&amp; weapon.attack())</span>
+<span class="nc" id="L219">                        weapon.setActive(false);</span>
+<span class="nc" id="L220">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L221">                    e.printStackTrace();</span>
+<span class="fc" id="L222">                }</span>
+<span class="fc" id="L223">                player.moveBy(0, -1);</span>
+<span class="fc" id="L224">                break;</span>
+            case KeyEvent.VK_DOWN:
+<span class="fc" id="L226">                player.setDirection(Direction.Down);</span>
+                try {
+<span class="fc" id="L228">                    Weapon weapon = player.weaponFactory().curWeapon();</span>
+<span class="pc bpc" id="L229" title="3 of 4 branches missed.">                    if(weapon instanceof BombGlove &amp;&amp; weapon.attack())</span>
+<span class="nc" id="L230">                        weapon.setActive(false);</span>
+<span class="nc" id="L231">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L232">                    e.printStackTrace();</span>
+<span class="fc" id="L233">                }</span>
+<span class="fc" id="L234">                player.moveBy(0, 1);</span>
+<span class="fc" id="L235">                break;</span>
+            case KeyEvent.VK_SPACE:
+<span class="nc" id="L237">                player.setBomb();</span>
+<span class="nc" id="L238">                break;</span>
+            case KeyEvent.VK_X:
+                try {
+<span class="nc" id="L241">                    Weapon weapon = player.weaponFactory().curWeapon();</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">                    if(weapon.attack())</span>
+<span class="nc" id="L243">                        weapon.setActive(false);</span>
+<span class="nc" id="L244">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L245">                    e.printStackTrace();</span>
+<span class="nc" id="L246">                }</span>
+<span class="nc" id="L247">                break;</span>
+            case KeyEvent.VK_Z:
+                try {
+<span class="nc" id="L250">                    Weapon weapon = player.weaponFactory().curWeapon();</span>
+<span class="nc bnc" id="L251" title="All 2 branches missed.">                    if(weapon.bigAttack()){</span>
+<span class="nc" id="L252">                        weapon.clearEnergy();</span>
+<span class="nc" id="L253">                        weapon.setActive(false);</span>
+                    }
+<span class="nc" id="L255">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L256">                    e.printStackTrace();</span>
+<span class="nc" id="L257">                }</span>
+<span class="nc" id="L258">                break;</span>
+            case KeyEvent.VK_C:
+                try {
+<span class="nc" id="L261">                    player.weaponFactory().switchWeapon();</span>
+<span class="nc" id="L262">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L263">                    e.printStackTrace();</span>
+<span class="nc" id="L264">                }</span>
+<span class="nc" id="L265">                break;</span>
+            case KeyEvent.VK_W:
+                try {
+<span class="nc" id="L268">                    ((ThrowableWeapon)player.weaponFactory().curWeapon()).dyMoveUp();</span>
+<span class="nc" id="L269">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L270">                    e.printStackTrace();</span>
+<span class="nc" id="L271">                } catch (ClassCastException e){</span>
+<span class="nc" id="L272">                    e.printStackTrace();</span>
+<span class="nc" id="L273">                }</span>
+<span class="nc" id="L274">                break;</span>
+            case KeyEvent.VK_S:
+                try {
+<span class="nc" id="L277">                    ((ThrowableWeapon)player.weaponFactory().curWeapon()).dyMoveDown();</span>
+<span class="nc" id="L278">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L279">                    e.printStackTrace();</span>
+<span class="nc" id="L280">                } catch (ClassCastException e){</span>
+<span class="nc" id="L281">                    e.printStackTrace();</span>
+<span class="nc" id="L282">                }</span>
+<span class="nc" id="L283">                break;</span>
+            case KeyEvent.VK_A:
+                try {
+<span class="nc" id="L286">                    ((ThrowableWeapon)player.weaponFactory().curWeapon()).dxMoveLeft();</span>
+<span class="nc" id="L287">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L288">                    e.printStackTrace();</span>
+<span class="nc" id="L289">                } catch (ClassCastException e){</span>
+<span class="nc" id="L290">                    e.printStackTrace();</span>
+<span class="nc" id="L291">                }</span>
+<span class="nc" id="L292">                break;</span>
+            case KeyEvent.VK_D:
+                try {
+<span class="nc" id="L295">                    ((ThrowableWeapon)player.weaponFactory().curWeapon()).dxMoveRight();</span>
+<span class="nc" id="L296">                } catch (NullPointerException e) {</span>
+<span class="nc" id="L297">                    e.printStackTrace();</span>
+<span class="nc" id="L298">                } catch (ClassCastException e){</span>
+<span class="nc" id="L299">                    e.printStackTrace();</span>
+<span class="nc" id="L300">                }</span>
+<span class="nc" id="L301">                break;</span>
+            case KeyEvent.VK_ESCAPE:
+<span class="fc" id="L303">                world.setWorldPauseFlag(true);</span>
+<span class="fc" id="L304">                musicStuff.stop();</span>
+<span class="fc" id="L305">                return new PauseScreen(this);</span>
+        }
+
+<span class="fc" id="L308">        return this.refreshWorld();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 游戏界面的ScrollX值
+     * @description: 读取游戏界面的ScrollX值
+     */    
+    public int getScrollX() {
+<span class="fc" id="L317">        return Math.max(0, Math.min(player.x() - screenWidth / 2, world.width() - screenWidth));</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 游戏界面的ScrollY值
+     * @description: 读取游戏界面的ScrollY值
+     */    
+    public int getScrollY() {
+<span class="fc" id="L326">        return Math.max(0, Math.min(player.y() - screenHeight / 2, world.height() - screenHeight));</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {World} 游戏界面的世界
+     * @description: 读取游戏界面的world字段
+     */    
+    public World world(){
+<span class="fc" id="L335">        return this.world;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {WorldBuilder} 游戏界面的世界构建器
+     * @description: 读取游戏界面的worldBuilder字段
+     */    
+    public WorldBuilder worldBuilder(){
+<span class="fc" id="L344">        return this.worldBuilder;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {MusicStuff} 游戏界面的音乐播放器
+     * @description: 读取游戏界面的musicStuff字段
+     */    
+    public MusicStuff musicStuff(){
+<span class="fc" id="L353">        return this.musicStuff;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Player} player 玩家人物
+     * @return {*}
+     * @description: 设置游戏界面的玩家人物
+     */    
+<span class="fc" id="L362">    public void setPlayer(Player player){ this.player = player; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Player} 游戏界面的玩家人物
+     * @description: 读取游戏界面的player字段
+     */    
+<span class="fc" id="L369">    public Player player(){ return this.player; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;String&gt;} 游戏界面的消息序列
+     * @description: 读取游戏界面的messages字段
+     */    
+<span class="fc" id="L376">    public List&lt;String&gt; messages(){ return this.messages; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {List&lt;String&gt;} messages 消息序列
+     * @return {*}
+     * @description: 设置游戏界面的消息序列
+     */    
+<span class="nc" id="L384">    public void setMessages(List&lt;String&gt; messages){ this.messages = messages; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {List&lt;String&gt;} oldMessages 旧消息序列
+     * @return {*}
+     * @description: 设置游戏界面的就消息序列
+     */    
+<span class="nc" id="L392">    public void setOldMessages(List&lt;String&gt; oldMessages){ this.oldMessages = oldMessages; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {CreatureFactory} 游戏界面的生物工厂
+     * @description: 读取游戏界面的creatureFactory字段
+     */    
+<span class="fc" id="L399">    public CreatureFactory creatureFactory(){ return this.creatureFactory; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Recorder} 游戏界面的记录器
+     * @description: 读取游戏界面的recorder字段
+     */    
+<span class="nc" id="L406">    public Recorder recorder(){ return this.recorder; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 游戏界面的记录标志
+     * @description: 读取游戏界面的recordFlag字段
+     */    
+<span class="fc" id="L413">    public boolean recordFlag(){ return this.recordFlag; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 游戏界面的屏幕宽度
+     * @description: 读取游戏界面的screenWidth字段
+     */    
+<span class="fc" id="L420">    public int screenWidth(){ return this.screenWidth; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 游戏界面的屏幕高度
+     * @description: 读取游戏界面的screenHeight字段
+     */    
+<span class="fc" id="L427">    public int screenHeight(){ return this.screenHeight; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {String} 游戏界面的音乐名称
+     * @description: 读取游戏界面的musicName字段
+     */    
+<span class="fc" id="L434">    public String musicName(){ return this.musicName; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {String} 游戏界面的房间地址
+     * @description: 读取游戏界面的playScreenAddress字段
+     */    
+<span class="fc" id="L441">    public String playScreenAddress(){ return this.playScreenAddress; }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 开始记录
+     */    
+    public void startRecord(){
+<span class="fc" id="L449">        this.recorder = new Recorder();</span>
+<span class="fc" id="L450">        this.recordFlag = true;</span>
+<span class="fc" id="L451">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 停止记录
+     */    
+    public void endRecord(){
+<span class="fc" id="L459">        this.recordFlag = false;</span>
+        try {
+<span class="fc" id="L461">            Recorder.writeRecorder(recorder);</span>
+<span class="nc" id="L462">        } catch (IOException e) {</span>
+<span class="nc" id="L463">            e.printStackTrace();</span>
+<span class="nc" id="L464">        } catch (ClassNotFoundException e){</span>
+<span class="nc" id="L465">            e.printStackTrace();</span>
+<span class="pc" id="L466">        }</span>
+<span class="fc" id="L467">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {CreatureFactory} creatureFactory 用于生成生物的工厂
+     * @return {*}
+     * @description: 在此游戏界面的世界中生成生物
+     */    
+    protected void createCreatures(CreatureFactory creatureFactory) {
+        // 创造苹果
+<span class="fc bfc" id="L477" title="All 2 branches covered.">        for (int i = 0; i &lt; 10; i++) {</span>
+<span class="fc" id="L478">            Creature apple = creatureFactory.newApples();</span>
+<span class="fc" id="L479">            new AppleAI(apple, this.creatureFactory);</span>
+            //new AppleAI(apple, new CreatureFactory(world, 0));
+        }
+
+        // 创造妖精
+<span class="fc bfc" id="L484" title="All 2 branches covered.">        for(int i = 0; i &lt; PlayScreen.GOBLIN_SIZE; i++) {</span>
+<span class="fc" id="L485">            creatureFactory.newRandomGoblin();</span>
+        }
+        // 妖精们开始运动
+<span class="fc" id="L488">        creatureFactory.enableGoblinsStartMove();</span>
+<span class="fc" id="L489">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 创建世界
+     */    
+    protected void createWorld() {
+<span class="fc" id="L497">        world = this.worldBuilder.makeCaves().build();</span>
+<span class="fc" id="L498">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} worldName 世界名称
+     * @return {*}
+     * @description: 加载世界
+     */    
+    protected boolean loadWorld(String worldName) {
+<span class="pc bpc" id="L507" title="1 of 2 branches missed.">        if(worldName == &quot;New World&quot;){</span>
+<span class="fc" id="L508">            createWorld();</span>
+<span class="fc" id="L509">            return true;</span>
+        }
+<span class="nc" id="L511">        world = this.worldBuilder.loadWorld(worldName);</span>
+<span class="nc bnc" id="L512" title="All 2 branches missed.">        return (world != null);</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {List&lt;String&gt;} messages 最新消息序列
+     * @return {*}
+     * @description: 展示消息序列的内容
+     */    
+    public void displayMessages(AsciiPanel terminal, List&lt;String&gt; messages) {
+<span class="fc bfc" id="L523" title="All 2 branches covered.">        if(!messages.isEmpty()){</span>
+<span class="fc" id="L524">            this.oldMessages.clear();</span>
+<span class="fc" id="L525">            this.oldMessages.addAll(messages);</span>
+<span class="fc" id="L526">            messages.clear();</span>
+        }
+
+<span class="fc" id="L529">        int top = this.screenHeight - messages.size();</span>
+<span class="fc bfc" id="L530" title="All 2 branches covered.">        for (int i = 0; i &lt; oldMessages.size(); i++) {</span>
+<span class="fc" id="L531">            terminal.write(oldMessages.get(i), 1, top + i + 1);</span>
+        }
+
+<span class="fc" id="L534">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 展示世界的地形、生物、玩家状态等等内容
+     */    
+    public void displayTiles(AsciiPanel terminal, int left, int top) {
+<span class="fc" id="L545">        showTerrain(terminal, left, top);</span>
+<span class="fc" id="L546">        showBombs(terminal,left,top);</span>
+<span class="fc" id="L547">        showBullets(terminal, left, top);</span>
+<span class="fc" id="L548">        showAttackDots(terminal, left, top);</span>
+<span class="fc" id="L549">        showThrowableItems(terminal, left, top);</span>
+<span class="fc" id="L550">        showCreatures(terminal, left, top);</span>
+<span class="fc" id="L551">        showThrowableWeapon(terminal, left, top);</span>
+        // Creatures can choose their next action now
+<span class="fc" id="L553">        world.update();</span>
+<span class="fc" id="L554">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @return {*}
+     * @description: 展示玩家当前的状态
+     */    
+    public void displayPlayerInfo(AsciiPanel terminal) {
+        // Stats
+        // Direction
+<span class="fc" id="L565">        Tile direction = this.player.direction().image();</span>
+<span class="fc" id="L566">        terminal.write(direction.glyph(), 1, 24, direction.color());</span>
+
+<span class="fc" id="L568">        terminal.write(&quot;   &quot;, terminal.getCursorX(), 24);</span>
+        // HP
+<span class="fc" id="L570">        terminal.write(Tile.HP.glyph(), terminal.getCursorX(), 24, Tile.HP.color());</span>
+<span class="fc" id="L571">        String stats = String.format(&quot;:%3d/%3d   &quot;, player.hp(), player.maxHP());</span>
+<span class="fc" id="L572">        terminal.write(stats, terminal.getCursorX(), 24, Tile.HP.color());</span>
+        // Speed
+<span class="fc" id="L574">        terminal.write(Tile.SPEED.glyph(), terminal.getCursorX(), 24, Tile.SPEED.color());</span>
+<span class="fc" id="L575">        stats = String.format(&quot;:%d   &quot;, player.moveSpeed());</span>
+<span class="fc" id="L576">        terminal.write(stats, terminal.getCursorX(), 24, Tile.SPEED.color());</span>
+<span class="fc" id="L577">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @return {*}
+     * @description: 展示当前武器的信息
+     */    
+    public void displayCurWeaponInfo(AsciiPanel terminal) {
+<span class="fc" id="L586">        Weapon curWeapon = this.player.weaponFactory().curWeapon();</span>
+        try {
+<span class="fc" id="L588">            String weaponStats = null;</span>
+<span class="fc" id="L589">            terminal.write(curWeapon.glyph(), terminal.getCursorX(), 24, curWeapon.color());</span>
+
+<span class="fc" id="L591">            weaponStats = (&quot; &quot; + (curWeapon.attackValue()));</span>
+<span class="fc" id="L592">            terminal.write(weaponStats, terminal.getCursorX(), 24, curWeapon.color());</span>
+
+<span class="pc bpc" id="L594" title="1 of 2 branches missed.">            if(curWeapon instanceof Gun){ // 当前武器是枪，显示剩余子弹数量</span>
+<span class="nc" id="L595">                Gun curGun = (Gun)curWeapon;</span>
+<span class="nc" id="L596">                weaponStats = &quot; %d/%d&quot;;</span>
+<span class="nc" id="L597">                weaponStats = String.format(weaponStats, curGun.remainingBullet(), curGun.maxBulletAmount());</span>
+<span class="nc" id="L598">                terminal.write(weaponStats, terminal.getCursorX(), 24, AsciiPanel.brightYellow);</span>
+<span class="nc" id="L599">                terminal.write(Tile.BULLET.glyph(), terminal.getCursorX(), 24, Tile.BULLET.color());</span>
+<span class="nc" id="L600">            }</span>
+<span class="fc bfc" id="L601" title="All 2 branches covered.">            else if(curWeapon instanceof ThrowableWeapon){ // 当前武器是抛掷类武器</span>
+<span class="fc" id="L602">                ThrowableWeapon curThrowableWeapon = (ThrowableWeapon)curWeapon;</span>
+<span class="fc" id="L603">                weaponStats = &quot; %d/%d&quot;;</span>
+<span class="fc" id="L604">                weaponStats = String.format(weaponStats, curThrowableWeapon.remainingItems(), curThrowableWeapon.maxItemsAmount());</span>
+<span class="fc" id="L605">                terminal.write(weaponStats, terminal.getCursorX(), 24, AsciiPanel.brightYellow);</span>
+<span class="fc" id="L606">                terminal.write(Tile.THROW_ITEM.glyph(), terminal.getCursorX(), 24, Tile.THROW_ITEM.color());</span>
+            }
+
+<span class="fc" id="L609">            weaponStats = (&quot; &quot; + (curWeapon.curEnergy()*100/curWeapon.maxEnergy()) + &quot;%&quot;);</span>
+<span class="fc" id="L610">            terminal.write(weaponStats, terminal.getCursorX(), 24, AsciiPanel.brightYellow);</span>
+<span class="fc" id="L611">            terminal.write(Tile.ENERGY.glyph(), terminal.getCursorX(), 24, Tile.ENERGY.color());</span>
+<span class="nc" id="L612">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L613">            e.printStackTrace();</span>
+<span class="fc" id="L614">        }</span>
+<span class="fc" id="L615">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 展示地形信息
+     */    
+    protected void showTerrain(AsciiPanel terminal, int left, int top){
+        // 刷新传送门位置
+<span class="fc" id="L627">        this.world.doorPairs().refreshDoorPairs(this.world);</span>
+
+        // 刷新草丛位置
+<span class="fc" id="L630">        this.world.grasses().refreshGrasses(this.world);</span>
+
+        // 刷新宝箱位置
+<span class="fc" id="L633">        this.world.boxes().refreshBox(this.world);</span>
+
+        // 刷新火堆位置
+<span class="fc" id="L636">        this.world.firePiles().refreshFirePiles(this.world);</span>
+
+<span class="fc" id="L638">        Tile tile = null;</span>
+<span class="fc bfc" id="L639" title="All 2 branches covered.">        for (int x = 0; x &lt; screenWidth; x++) {</span>
+<span class="fc bfc" id="L640" title="All 2 branches covered.">            for (int y = 0; y &lt; screenHeight; y++) {</span>
+<span class="fc" id="L641">                int wx = x + left;</span>
+<span class="fc" id="L642">                int wy = y + top;</span>
+
+<span class="fc bfc" id="L644" title="All 2 branches covered.">                if (player.canSee(wx, wy)) {</span>
+<span class="fc" id="L645">                    tile = world.tile(wx, wy);</span>
+
+<span class="pc bpc" id="L647" title="3 of 4 branches missed.">                    if (this.player.weaponFactory().curWeapon() instanceof Torch &amp;&amp;</span>
+<span class="nc bnc" id="L648" title="All 2 branches missed.">                        tile == Tile.FLOOR &amp;&amp; this.player.distance(wx, wy) &lt;= Torch.RANGE)</span>
+<span class="nc" id="L649">                        terminal.write(Tile.FLOOR_LIGHT.glyph(), x, y, Tile.FLOOR_LIGHT.color());</span>
+                    else
+<span class="fc" id="L651">                        terminal.write(world.glyph(wx, wy), x, y, world.color(wx, wy));</span>
+                }
+                // else {
+                //     terminal.write(world.glyph(wx, wy), x, y, Color.DARK_GRAY);
+                // }
+            }
+        }
+<span class="fc" id="L658">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 绘制炸弹并进行攻击交互
+     */    
+    protected void showBombs(AsciiPanel terminal, int left, int top){
+<span class="fc" id="L669">        int old_size = this.world.getBombsSize();</span>
+<span class="fc" id="L670">        int new_size = this.world.getBombsSize();</span>
+<span class="fc bfc" id="L671" title="All 2 branches covered.">        for(int index = 0; index &lt; new_size;){</span>
+<span class="fc" id="L672">            Bomb bomb = this.world.getBombAt(index);</span>
+<span class="fc" id="L673">            int x = bomb.x();</span>
+<span class="fc" id="L674">            int y = bomb.y();</span>
+<span class="fc" id="L675">            int range = bomb.range();</span>
+
+<span class="pc bpc" id="L677" title="1 of 2 branches missed.">            if(!bomb.isAlive()){ // 炸弹死了</span>
+<span class="nc bnc" id="L678" title="All 2 branches missed.">                for(int i = x-range; i &lt;= x+range; i++)</span>
+<span class="nc" id="L679">                    this.world.setThing(Tile.FLOOR, i, y);</span>
+<span class="nc bnc" id="L680" title="All 2 branches missed.">                for(int j = y-range; j &lt;= y+range; j++)</span>
+<span class="nc bnc" id="L681" title="All 2 branches missed.">                    if(j != y)this.world.setThing(Tile.FLOOR, x, j);</span>
+<span class="nc" id="L682">                this.world.removeBomb(bomb);</span>
+            }
+<span class="fc bfc" id="L684" title="All 2 branches covered.">            else if(bombAttackCreatures(bomb)){</span>
+<span class="fc" id="L685">                bomb.stopMove();</span>
+<span class="fc bfc" id="L686" title="All 2 branches covered.">                for(int i = x-range; i &lt;= x+range; i++)</span>
+<span class="fc bfc" id="L687" title="All 2 branches covered.">                    if(i != x) this.world.setThing(Tile.BOMB_X, i, y);</span>
+<span class="fc bfc" id="L688" title="All 2 branches covered.">                for(int j = y-range; j &lt;= y+range; j++)</span>
+<span class="fc bfc" id="L689" title="All 2 branches covered.">                    if(j != y) this.world.setThing(Tile.BOMB_Y, x, j);</span>
+            }
+
+<span class="fc" id="L692">            new_size = this.world.getBombsSize();</span>
+<span class="pc bpc" id="L693" title="1 of 2 branches missed.">            if(new_size &lt; old_size)</span>
+<span class="nc" id="L694">                old_size = new_size;</span>
+            else
+<span class="fc" id="L696">                index++;</span>
+<span class="fc" id="L697">        }</span>
+<span class="fc" id="L698">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 绘制子弹并进行攻击交互
+     */    
+    protected void showBullets(AsciiPanel terminal, int left, int top) {
+<span class="fc" id="L709">        int old_size = this.world.getBullets().size();</span>
+<span class="fc" id="L710">        int new_size = this.world.getBullets().size();</span>
+<span class="pc bpc" id="L711" title="1 of 2 branches missed.">        for(int index = 0; index &lt; new_size;){</span>
+<span class="nc" id="L712">            Bullet bullet = this.world.getBullets().get(index);</span>
+<span class="nc" id="L713">            int x = bullet.x();</span>
+<span class="nc" id="L714">            int y = bullet.y();</span>
+
+<span class="nc bnc" id="L716" title="All 2 branches missed.">            if(!this.world.tile(x, y).isGround() || // 子弹触碰到障碍物</span>
+<span class="nc bnc" id="L717" title="All 2 branches missed.">                bullet.range() == 0 ||              // 子弹超出射程</span>
+<span class="nc bnc" id="L718" title="All 2 branches missed.">                bulletAttackCreatures(bullet)       // 子弹击中生物</span>
+                ){
+<span class="nc" id="L720">                this.world.removeBullet(bullet);;   // 移除该子弹</span>
+            }
+            else{ // 没碰到障碍物，没超出射程，也没几种生物，绘制子弹
+<span class="nc bnc" id="L723" title="All 8 branches missed.">                if (x &gt;= left &amp;&amp; x &lt; left + screenWidth &amp;&amp;</span>
+                    y &gt;= top  &amp;&amp; y &lt; top + screenHeight &amp;&amp;
+<span class="nc bnc" id="L725" title="All 2 branches missed.">                    player.canSee(x, y))</span>
+<span class="nc" id="L726">                    terminal.write(bullet.image().glyph(), x - left, y - top, bullet.image().color());</span>
+            }
+<span class="nc" id="L728">            new_size = this.world.getBullets().size();</span>
+<span class="nc bnc" id="L729" title="All 2 branches missed.">            if(new_size &lt; old_size)</span>
+<span class="nc" id="L730">                old_size = new_size;</span>
+            else
+<span class="nc" id="L732">                index++;</span>
+<span class="nc" id="L733">        }</span>
+<span class="fc" id="L734">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 绘制世界中的所有生物
+     */    
+    protected void showCreatures(AsciiPanel terminal, int left, int top) {
+<span class="fc" id="L745">        synchronized(world.getCreatures()){</span>
+<span class="fc bfc" id="L746" title="All 2 branches covered.">            for (Creature creature : world.getCreatures()) {</span>
+<span class="pc bpc" id="L747" title="2 of 4 branches missed.">                if (creature.x() &gt;= left &amp;&amp; creature.x() &lt; left + screenWidth &amp;&amp;</span>
+<span class="fc bfc" id="L748" title="All 4 branches covered.">                    creature.y() &gt;= top  &amp;&amp; creature.y() &lt; top + screenHeight) {</span>
+<span class="pc bpc" id="L749" title="1 of 4 branches missed.">                    if (player.canSee(creature.x(), creature.y()) &amp;&amp; creature.isVisible()) {</span>
+<span class="fc" id="L750">                        terminal.write(creature.glyph(), creature.x() - left, creature.y() - top, creature.color());</span>
+                    }
+                }
+<span class="fc" id="L753">            }</span>
+<span class="fc" id="L754">        }</span>
+<span class="fc" id="L755">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 绘制攻击点并进行攻击交互
+     */    
+    protected void showAttackDots(AsciiPanel terminal, int left, int top) {
+<span class="fc" id="L766">        int old_size = this.world.getAttackDots().size();</span>
+<span class="fc" id="L767">        int new_size = this.world.getAttackDots().size();</span>
+<span class="fc bfc" id="L768" title="All 2 branches covered.">        for(int index = 0; index &lt; new_size;){</span>
+<span class="fc" id="L769">            AttackDot attackDot = this.world.getAttackDots().get(index);</span>
+<span class="fc" id="L770">            int x = attackDot.x();</span>
+<span class="fc" id="L771">            int y = attackDot.y();</span>
+
+            // 攻击
+<span class="fc" id="L774">            dotAttackCreatures(attackDot);</span>
+
+            // 绘图
+<span class="pc bpc" id="L777" title="4 of 8 branches missed.">            if (x &gt;= left &amp;&amp; x &lt; left + screenWidth &amp;&amp;</span>
+                y &gt;= top  &amp;&amp; y &lt; top + screenHeight &amp;&amp;
+<span class="pc bpc" id="L779" title="1 of 2 branches missed.">                player.canSee(x, y))</span>
+<span class="fc" id="L780">                terminal.write(attackDot.image().glyph(), x - left, y - top, attackDot.image().color());</span>
+
+<span class="fc" id="L782">            new_size = this.world.getAttackDots().size();</span>
+<span class="pc bpc" id="L783" title="1 of 2 branches missed.">            if(new_size &lt; old_size)</span>
+<span class="nc" id="L784">                old_size = new_size;</span>
+            else
+<span class="fc" id="L786">                index++;</span>
+<span class="fc" id="L787">        }</span>
+<span class="fc" id="L788">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 绘制抛掷物并进行攻击交互
+     */    
+    protected void showThrowableItems(AsciiPanel terminal, int left, int top){
+<span class="fc" id="L799">        int old_size = this.world.getThrowableItems().size();</span>
+<span class="fc" id="L800">        int new_size = this.world.getThrowableItems().size();</span>
+<span class="pc bpc" id="L801" title="1 of 2 branches missed.">        for(int index = 0; index &lt; new_size;){</span>
+<span class="nc" id="L802">            ThrowableItem throwableItem = this.world.getThrowableItems().get(index);</span>
+<span class="nc" id="L803">            int x = throwableItem.x();</span>
+<span class="nc" id="L804">            int y = throwableItem.y();</span>
+<span class="nc" id="L805">            int range = throwableItem.range();</span>
+
+<span class="nc bnc" id="L807" title="All 2 branches missed.">            if(!throwableItem.isAlive()){ // 扔物爆炸完了，要清除</span>
+<span class="nc bnc" id="L808" title="All 2 branches missed.">                for(int i = x-range; i &lt;= x+range; i++)</span>
+<span class="nc bnc" id="L809" title="All 2 branches missed.">                    for(int j = y-range; j &lt;= y+range; j++)</span>
+<span class="nc" id="L810">                        this.world.setThing(Tile.FLOOR, i, j);</span>
+<span class="nc" id="L811">                this.world.removeThrowableItem(throwableItem);</span>
+            }
+<span class="nc bnc" id="L813" title="All 2 branches missed.">            else if(throwableItemAttackCreatures(throwableItem)){</span>
+<span class="nc bnc" id="L814" title="All 2 branches missed.">                for(int i = x-range; i &lt;= x+range; i++)</span>
+<span class="nc bnc" id="L815" title="All 2 branches missed.">                    for(int j = y-range; j &lt;= y+range; j++)</span>
+<span class="nc" id="L816">                        this.world.setThing(throwableItem.image(), i, j);</span>
+            }
+
+<span class="nc" id="L819">            new_size = this.world.getThrowableItems().size();</span>
+<span class="nc bnc" id="L820" title="All 2 branches missed.">            if(new_size &lt; old_size)</span>
+<span class="nc" id="L821">                old_size = new_size;</span>
+            else
+<span class="nc" id="L823">                index++;</span>
+<span class="nc" id="L824">        }</span>
+<span class="fc" id="L825">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 绘制抛掷物的准星
+     */
+    protected void showThrowableWeapon(AsciiPanel terminal, int left, int top){
+<span class="fc" id="L836">        Weapon currentWeapon = player.weaponFactory().curWeapon();</span>
+<span class="fc bfc" id="L837" title="All 2 branches covered.">        if(!(currentWeapon instanceof ThrowableWeapon))</span>
+<span class="fc" id="L838">            return;</span>
+
+<span class="fc" id="L840">            ThrowableWeapon throwableWeapon = (ThrowableWeapon)currentWeapon;</span>
+<span class="fc" id="L841">        int x = this.player.x() + throwableWeapon.dx();</span>
+<span class="fc" id="L842">        int y = this.player.y() + throwableWeapon.dy();</span>
+
+<span class="pc bpc" id="L844" title="1 of 2 branches missed.">        if(this.world.inBound(x, y))</span>
+<span class="fc" id="L845">            terminal.write(Tile.AIM.glyph(), x - left, y - top, Tile.AIM.color());</span>
+<span class="fc" id="L846">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 让炸弹去攻击生物以及可摧毁地形
+     */
+    protected boolean bombAttackCreatures(Bomb bomb){
+<span class="fc bfc" id="L857" title="All 2 branches covered.">        if(!bomb.isActive())</span>
+<span class="fc" id="L858">            return false;</span>
+
+        // 攻击生物(AI和玩家)
+<span class="fc" id="L861">        int old_size = this.world.getCreaturesSize();</span>
+<span class="fc" id="L862">        int new_size = this.world.getCreaturesSize();</span>
+<span class="fc bfc" id="L863" title="All 2 branches covered.">        for(int i = 0; i &lt; new_size;){</span>
+<span class="fc" id="L864">            bomb.attack(this.world.getCreatureAt(i));</span>
+
+<span class="fc" id="L866">            new_size = this.world.getCreaturesSize();</span>
+<span class="fc bfc" id="L867" title="All 2 branches covered.">            if(new_size &lt; old_size)</span>
+<span class="fc" id="L868">                old_size = new_size;</span>
+            else
+<span class="fc" id="L870">                i++;</span>
+        }
+
+        // 1秒后死亡
+<span class="fc" id="L874">        Runnable runnable = new Runnable() {</span>
+        	public void run() {
+                try {
+<span class="fc" id="L877">                    Thread.sleep(1000);</span>
+<span class="nc" id="L878">                } catch (InterruptedException e) {</span>
+<span class="nc" id="L879">                    e.printStackTrace();</span>
+<span class="fc" id="L880">                }</span>
+<span class="fc" id="L881">        		bomb.dead();</span>
+<span class="fc" id="L882">        	}</span>
+        };
+<span class="fc" id="L884">        Thread thread = new Thread(runnable);</span>
+<span class="fc" id="L885">        thread.start();</span>
+
+<span class="fc" id="L887">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 让子弹去攻击生物
+     */
+    protected boolean bulletAttackCreatures(Bullet bullet){
+<span class="nc" id="L899">        boolean hit = false;</span>
+<span class="nc" id="L900">        int old_size = this.world.getCreaturesSize();</span>
+<span class="nc" id="L901">        int new_size = this.world.getCreaturesSize();</span>
+<span class="nc bnc" id="L902" title="All 2 branches missed.">        for(int i = 0; i &lt; new_size;){</span>
+<span class="nc bnc" id="L903" title="All 2 branches missed.">            if(bullet.attack(this.world.getCreatureAt(i)))</span>
+<span class="nc" id="L904">                hit = true;</span>
+
+<span class="nc" id="L906">            new_size = this.world.getCreaturesSize();</span>
+<span class="nc bnc" id="L907" title="All 2 branches missed.">            if(new_size &lt; old_size)</span>
+<span class="nc" id="L908">                old_size = new_size;</span>
+            else
+<span class="nc" id="L910">                i++;</span>
+        }
+<span class="nc" id="L912">        return hit;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 让攻击点去攻击生物
+     */
+    protected boolean dotAttackCreatures(AttackDot attackDot){
+<span class="fc" id="L924">        boolean hit = false;</span>
+<span class="fc" id="L925">        int old_size = this.world.getCreaturesSize();</span>
+<span class="fc" id="L926">        int new_size = this.world.getCreaturesSize();</span>
+<span class="fc bfc" id="L927" title="All 2 branches covered.">        for(int i = 0; i &lt; new_size;){</span>
+<span class="pc bpc" id="L928" title="1 of 2 branches missed.">            if(attackDot.attack(this.world.getCreatureAt(i)))</span>
+<span class="nc" id="L929">                hit = true;</span>
+
+<span class="fc" id="L931">            new_size = this.world.getCreaturesSize();</span>
+<span class="pc bpc" id="L932" title="1 of 2 branches missed.">            if(new_size &lt; old_size)</span>
+<span class="nc" id="L933">                old_size = new_size;</span>
+            else
+<span class="fc" id="L935">                i++;</span>
+        }
+<span class="fc" id="L937">        return hit;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {AsciiPanel} terminal 目标终端
+     * @param {int} left 左间距
+     * @param {int} top 上间距
+     * @return {*}
+     * @description: 让抛掷物去攻击生物
+     */
+    protected boolean throwableItemAttackCreatures(ThrowableItem throwableItem){
+<span class="nc bnc" id="L949" title="All 2 branches missed.">        if(!throwableItem.isActive())</span>
+<span class="nc" id="L950">            return false;</span>
+
+        // 攻击生物(AI和玩家)
+<span class="nc" id="L953">        int old_size = this.world.getCreaturesSize();</span>
+<span class="nc" id="L954">        int new_size = this.world.getCreaturesSize();</span>
+<span class="nc bnc" id="L955" title="All 2 branches missed.">        for(int i = 0; i &lt; new_size;){</span>
+<span class="nc" id="L956">            throwableItem.attack(this.world.getCreatureAt(i));</span>
+
+<span class="nc" id="L958">            new_size = this.world.getCreaturesSize();</span>
+<span class="nc bnc" id="L959" title="All 2 branches missed.">            if(new_size &lt; old_size)</span>
+<span class="nc" id="L960">                old_size = new_size;</span>
+            else
+<span class="nc" id="L962">                i++;</span>
+        }
+
+        // 一段时间(remainTime)后死亡
+<span class="nc" id="L966">        Runnable runnable = new Runnable() {</span>
+        	public void run() {
+                try {
+<span class="nc" id="L969">                    Thread.sleep(throwableItem.remainTime());</span>
+<span class="nc" id="L970">                } catch (InterruptedException e) {</span>
+<span class="nc" id="L971">                    e.printStackTrace();</span>
+<span class="nc" id="L972">                }</span>
+<span class="nc" id="L973">        		throwableItem.dead();</span>
+<span class="nc" id="L974">        	}</span>
+        };
+<span class="nc" id="L976">        Thread thread = new Thread(runnable);</span>
+<span class="nc" id="L977">        thread.start();</span>
+
+<span class="nc" id="L979">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 玩家每次按下按键会刷新一次世界，来判断玩家是否死亡、是否进入特殊地形等
+     */    
+    public Screen refreshWorld(){
+<span class="fc bfc" id="L988" title="All 2 branches covered.">        for(Player player : this.world.getPlayers()){</span>
+<span class="pc bpc" id="L989" title="1 of 2 branches missed.">            if(player.hp() &lt; 1){</span>
+<span class="nc" id="L990">                this.musicStuff.stop();</span>
+<span class="nc" id="L991">                this.world.remove(player);</span>
+<span class="nc" id="L992">                return new LoseScreen();</span>
+            }
+
+<span class="pc bpc" id="L995" title="1 of 2 branches missed.">            if(player.world().grasses().hideCreature(player))</span>
+<span class="nc" id="L996">                return this;</span>
+
+<span class="pc bpc" id="L998" title="1 of 2 branches missed.">            if(player.world().boxes().enterBox(player))</span>
+<span class="nc" id="L999">                return this;</span>
+
+<span class="fc" id="L1001">            player.expose();</span>
+<span class="fc" id="L1002">            int x = player.x(), y = player.y();</span>
+<span class="fc" id="L1003">            Tile stepOnThing = this.world.tile(x, y);</span>
+
+<span class="pc bpc" id="L1005" title="15 of 16 branches missed.">            switch (stepOnThing) {</span>
+                // 踩到道具
+                case BOMB_UPGRADE_RANGE:
+<span class="nc" id="L1008">                    player.bombExpandRange();</span>
+<span class="nc" id="L1009">                    player.notify(&quot;Bomb's range ++ !&quot;);</span>
+<span class="nc" id="L1010">                    break;</span>
+                case SPEED_UPGRADE:
+<span class="nc" id="L1012">                    player.speedUpgrade();</span>
+<span class="nc" id="L1013">                    player.notify(&quot;Speed ++ !&quot;);</span>
+<span class="nc" id="L1014">                    break;</span>
+                case HP_UPGRADE:
+<span class="nc" id="L1016">                    player.addHP();;</span>
+<span class="nc" id="L1017">                    player.notify(&quot;Hp ++ !&quot;);</span>
+<span class="nc" id="L1018">                    break;</span>
+                case ENERGY_UPGRADE:
+<span class="nc" id="L1020">                    player.weaponFactory().curWeapon().chargeEnergy();</span>
+<span class="nc" id="L1021">                    player.notify(&quot;Energy ++ !&quot;);</span>
+<span class="nc" id="L1022">                    break;</span>
+                case VISUAL_RANGE_UPGRADE:
+<span class="nc" id="L1024">                    player.visionRadiusUpgrade();</span>
+<span class="nc" id="L1025">                    player.notify(&quot;Vision Radius ++ !&quot;);</span>
+<span class="nc" id="L1026">                    break;</span>
+                case ATTACK_UPGRADE:
+<span class="nc" id="L1028">                    player.attackUpgrade();</span>
+<span class="nc" id="L1029">                    player.notify(&quot;Hand Attack ++ !&quot;);</span>
+<span class="nc" id="L1030">                    break;</span>
+                case WEAPON_ATTACK_UPGRADE:
+<span class="nc" id="L1032">                    player.weaponFactory().curWeapon().attackUpgrade();;</span>
+<span class="nc" id="L1033">                    player.notify(&quot;Weapon Attack ++ !&quot;);</span>
+<span class="nc" id="L1034">                    break;</span>
+
+                // 踩到武器
+                case NORMAL_GUN:
+<span class="nc" id="L1038">                    player.weaponFactory().newNormalGun();</span>
+<span class="nc" id="L1039">                    player.notify(&quot;Get Normal Gun !&quot;);</span>
+<span class="nc" id="L1040">                    break;</span>
+                case LASER_GUN:
+<span class="nc" id="L1042">                    player.weaponFactory().newLaserGun();</span>
+<span class="nc" id="L1043">                    player.notify(&quot;Get Laser Gun !&quot;);</span>
+<span class="nc" id="L1044">                    break;</span>
+                case SHOT_GUN:
+<span class="nc" id="L1046">                    player.weaponFactory().newShotGun();</span>
+<span class="nc" id="L1047">                    player.notify(&quot;Get Shot Gun !&quot;);</span>
+<span class="nc" id="L1048">                    break;</span>
+                case SNIPER_GUN:
+<span class="nc" id="L1050">                    player.weaponFactory().newSniperGun();</span>
+<span class="nc" id="L1051">                    player.notify(&quot;Get Sniper Gun !&quot;);</span>
+<span class="nc" id="L1052">                    break;</span>
+                case BASEBALL_BAT:
+<span class="nc" id="L1054">                    player.weaponFactory().newBaseballBat();</span>
+<span class="nc" id="L1055">                    player.notify(&quot;Get Baseball Bat !&quot;);</span>
+<span class="nc" id="L1056">                    break;</span>
+                case DETONATOR_THROWER:
+<span class="nc" id="L1058">                    player.weaponFactory().newDetonatorThrower();</span>
+<span class="nc" id="L1059">                    player.notify(&quot;Get Detonator Thrower !&quot;);</span>
+<span class="nc" id="L1060">                    break;</span>
+                case BOMB_GLOVE:
+<span class="nc" id="L1062">                    player.weaponFactory().newBombGlove();</span>
+<span class="nc" id="L1063">                    player.notify(&quot;Get Bomb Glove !&quot;);</span>
+<span class="nc" id="L1064">                    break;</span>
+                case TORCH:
+<span class="nc" id="L1066">                    player.weaponFactory().newTorch();;</span>
+<span class="nc" id="L1067">                    player.notify(&quot;Get Torch !&quot;);</span>
+<span class="nc" id="L1068">                    break;</span>
+                default:    // 没有踩到道具
+<span class="fc" id="L1070">                    continue;</span>
+            }
+<span class="nc" id="L1072">            this.world.setThing(Tile.FLOOR, x, y);</span>
+<span class="nc" id="L1073">        }</span>
+<span class="fc" id="L1074">        return this;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Boxes.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.item</a> &gt; <span class="el_source">Boxes.java</span></div><h1>Boxes.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 17:43:08
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为箱子类，所有箱子内部一开始含有随机的武器，不可摧毁且可隐藏
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\item\Boxes.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.item;
+
+import java.util.List;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+import cn.edu.nju.cs.game.world.creature.bros.Player;
+import cn.edu.nju.cs.game.world.weapon.WeaponFactory;
+
+public class Boxes implements Serializable{
+
+    private int width,height;
+    private List&lt;Box&gt; boxes;
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} width 世界的宽度
+     * @param {int} height 世界的高度
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L48">    public Boxes(int width, int height){</span>
+<span class="fc" id="L49">        this.width = width;</span>
+<span class="fc" id="L50">        this.height = height;</span>
+<span class="fc" id="L51">        this.boxes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L52">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Lis&lt;Box&gt;} 箱子序列
+     * @description: 读取所有箱子
+     */    
+    public List&lt;Box&gt; boxesList(){
+<span class="fc" id="L60">        return this.boxes;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {Boxes.Box} 目标箱子
+     * @description: 根据坐标搜索目标箱子，若坐标上没有箱子则返回null
+     */    
+    public Boxes.Box search(int x, int y){
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        for(Box box : boxes)</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            if(box.equal(x, y))</span>
+<span class="fc" id="L73">                return box;</span>
+<span class="fc" id="L74">        return null;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {*}
+     * @description: 在目标坐标上添加箱子
+     */    
+    public boolean addBox(int x, int y){
+<span class="pc bpc" id="L85" title="3 of 8 branches missed.">        if (x &lt; 0 || x &gt;= width || y &lt; 0 || y &gt;= height)</span>
+<span class="fc" id="L86">            return false;</span>
+<span class="fc" id="L87">        boxes.add(new Boxes.Box(x, y));</span>
+<span class="fc" id="L88">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Player} player 玩家
+     * @return {boolean}
+     * @description: 玩家进入箱子，若玩家进入箱则隐身+拿武器，若未进入则什么也不做
+     */    
+    public boolean enterBox(Player player){
+<span class="fc" id="L98">        player.expose();</span>
+<span class="fc" id="L99">        int x = player.x(), y = player.y();</span>
+<span class="fc" id="L100">        World world = player.world();</span>
+
+        try {
+<span class="fc bfc" id="L103" title="All 3 branches covered.">            switch (world.tile(x, y)) {</span>
+                case BOX_CLOSE:
+<span class="fc" id="L105">                    player.hide();</span>
+<span class="fc" id="L106">                    Box box1 = world.boxes().search(x, y);</span>
+<span class="pc bpc" id="L107" title="2 of 4 branches missed.">                    if(box1 != null &amp;&amp; box1.weapon() != null){</span>
+<span class="fc" id="L108">                        player.weaponFactory().newWeapon(box1.open());</span>
+                    }
+<span class="fc" id="L110">                    return true;</span>
+                case BOX_OPEN:
+<span class="fc" id="L112">                    player.hide();</span>
+<span class="fc" id="L113">                    Box box2 = world.boxes().search(x, y);</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">                    if(box2 != null)</span>
+<span class="fc" id="L115">                        box2.close();</span>
+<span class="fc" id="L116">                    return true;</span>
+                default:
+                    break;
+            }
+<span class="fc" id="L120">            return false;</span>
+        } finally {
+<span class="fc" id="L122">            this.refreshBox(world);</span>
+        }
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {World} world 箱子所处世界
+     * @return {*}
+     * @description: 刷新箱子
+     */    
+    public void refreshBox(World world){
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        for(Box box : this.boxesList()){</span>
+<span class="fc" id="L134">            world.setThing(box.image(), box.x(), box.y());</span>
+<span class="fc" id="L135">        }</span>
+<span class="fc" id="L136">    }</span>
+
+    public class Box implements Serializable{
+        private int x, y;
+<span class="fc" id="L140">        public int x(){ return this.x; }</span>
+<span class="fc" id="L141">        public int y(){ return this.y; }</span>
+
+        private Tile image;
+        public Tile image(){
+<span class="fc" id="L145">            return this.image;</span>
+        }
+
+        private Tile weapon;
+        public Tile weapon(){
+<span class="fc" id="L150">            return this.weapon;</span>
+        }
+
+        public Tile open(){
+            try {
+<span class="fc" id="L155">                this.image = Tile.BOX_OPEN;</span>
+<span class="fc" id="L156">                return this.weapon;</span>
+            }
+            finally{
+<span class="fc" id="L159">                this.weapon = null;</span>
+            }
+        }
+
+        public void close(){
+<span class="fc" id="L164">            this.image = Tile.BOX_CLOSE;</span>
+<span class="fc" id="L165">        }</span>
+
+<span class="fc" id="L167">        public Box(int x, int y){</span>
+<span class="fc" id="L168">            this.x = x;</span>
+<span class="fc" id="L169">            this.y = y;</span>
+<span class="fc" id="L170">            this.image = Tile.BOX_CLOSE;</span>
+<span class="fc" id="L171">            this.weapon = WeaponFactory.newRandomWeapon();</span>
+<span class="fc" id="L172">        }</span>
+
+        public boolean equal(int x, int y){
+<span class="fc bfc" id="L175" title="All 4 branches covered.">            return this.x == x &amp;&amp; this.y == y;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreatureFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.creature</a> &gt; <span class="el_source">CreatureFactory.java</span></div><h1>CreatureFactory.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 17:11:53
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为生物工厂类，用于生成生物
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\creature\CreatureFactory.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.creature;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.item.World;
+import cn.edu.nju.cs.game.world.creature.bros.*;
+import cn.edu.nju.cs.game.world.creature.goblins.*;
+
+public class CreatureFactory{
+
+    private World world;
+    private int goblinSize;
+    private ScheduledExecutorService goblinsExecutorService;
+
+    /**
+     * @author: Xu YangXin
+     * @param {World} world 目标世界
+     * @param {int} goblinSize 妖精数量
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L54">    public CreatureFactory(World world, int goblinSize) {</span>
+<span class="fc" id="L55">        this.world = world;</span>
+<span class="fc" id="L56">        this.goblinSize = goblinSize;</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if(goblinSize &gt; 0){</span>
+<span class="fc" id="L58">            this.goblinsExecutorService = Executors.newScheduledThreadPool(this.goblinSize);</span>
+        }
+<span class="fc" id="L60">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {List&lt;String&gt;} messages 玩家的消息序列
+     * @param {String} playerName 玩家选择的人物名称
+     * @return {*}
+     * @description: 根据玩家选择的人物名称生成对应的葫芦娃
+     */    
+    public Player newPlayer(List&lt;String&gt; messages, String playerName) {
+        //Creature player = new Creature(this.world, (char)2, AsciiPanel.brightWhite, 100, 20, 5, 9);
+<span class="fc" id="L71">        Player player = null;</span>
+<span class="pc bpc" id="L72" title="5 of 8 branches missed.">        switch (playerName) {</span>
+<span class="fc" id="L73">            case &quot;FirstBro&quot;:   player = new FirstBro(world);   break;</span>
+<span class="fc" id="L74">            case &quot;SecondBro&quot;:  player = new SecondBro(world);  break;</span>
+<span class="nc" id="L75">            case &quot;ThirdBro&quot;:   player = new ThirdBro(world);   break;</span>
+<span class="nc" id="L76">            case &quot;ForthBro&quot;:   player = new ForthBro(world);   break;</span>
+<span class="nc" id="L77">            case &quot;FifthBro&quot;:   player = new FifthBro(world);   break;</span>
+<span class="nc" id="L78">            case &quot;SixthBro&quot;:   player = new SixthBro(world);   break;</span>
+<span class="fc" id="L79">            case &quot;SeventhBro&quot;: player = new SeventhBro(world); break;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L84">        world.addAtEmptyLocation(player);</span>
+<span class="fc" id="L85">        new PlayerAI(player, messages);</span>
+<span class="fc" id="L86">        player.setMessage(messages);</span>
+<span class="fc" id="L87">        return player;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成一堆苹果
+     */    
+    public Creature newApples() {
+<span class="fc" id="L96">        Creature apple = new Creature(this.world, Tile.APPLE.glyph(), Tile.APPLE.color(), 10, 0, 0, 0, 0);</span>
+<span class="fc" id="L97">        world.addAtEmptyLocation(apple);</span>
+<span class="fc" id="L98">        return apple;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成随机的妖精
+     */    
+    public Goblin newRandomGoblin(){
+<span class="fc" id="L107">        Goblin goblin = null;</span>
+<span class="pc bpc" id="L108" title="1 of 5 branches missed.">        switch (new Random().nextInt(4)) {</span>
+            case 0:
+<span class="fc" id="L110">                goblin = new Snake(world);</span>
+<span class="fc" id="L111">                break;</span>
+            case 1:
+<span class="fc" id="L113">                goblin = new Scorpion(world);</span>
+<span class="fc" id="L114">                break;</span>
+            case 2:
+<span class="fc" id="L116">                goblin = new Bat(world);</span>
+<span class="fc" id="L117">                break;</span>
+            case 3:
+<span class="fc" id="L119">                goblin = new Spider(world);</span>
+<span class="fc" id="L120">                break;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L125">        world.addAtEmptyLocation(goblin);</span>
+<span class="fc" id="L126">        new PlayerAI(goblin, new ArrayList&lt;String&gt;());</span>
+<span class="fc" id="L127">        return goblin;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 让世界中的所有妖精开始移动
+     */
+    public void enableGoblinsStartMove(){
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        for(Goblin goblin : this.world.getGoblins()){</span>
+<span class="fc" id="L137">            goblinStartMove(goblin);</span>
+<span class="fc" id="L138">        }</span>
+<span class="fc" id="L139">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {Goblin} goblin 目标妖精
+     * @return {*}
+     * @description: 让某个特定的妖精开始移动
+     */    
+    private void goblinStartMove(Goblin goblin){
+        // 妖精周期性进行移动和攻击
+<span class="fc" id="L149">        this.goblinsExecutorService.scheduleAtFixedRate(</span>
+<span class="fc" id="L150">        new Runnable() {</span>
+            @Override
+            public void run() {
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">                if(goblin.hp() &lt; 0)</span>
+<span class="nc" id="L154">                    return;</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                if(world.worldIsPaused())</span>
+<span class="fc" id="L156">                    return;</span>
+<span class="fc" id="L157">                goblin.moveOneStep();</span>
+<span class="fc" id="L158">                goblin.seeAndAttack();</span>
+
+<span class="fc" id="L160">            }</span>
+        },
+        goblin.moveSpeedInterval, goblin.moveSpeedInterval, TimeUnit.MILLISECONDS);
+<span class="fc" id="L163">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeaponFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon</a> &gt; <span class="el_source">WeaponFactory.java</span></div><h1>WeaponFactory.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 21:50:24
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为生产武器的武器工厂类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\WeaponFactory.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.item.Tile;
+import cn.edu.nju.cs.game.world.weapon.bomb.BombGlove;
+import cn.edu.nju.cs.game.world.weapon.gun.*;
+import cn.edu.nju.cs.game.world.weapon.melee.Baseball;
+import cn.edu.nju.cs.game.world.weapon.melee.BaseballBat;
+import cn.edu.nju.cs.game.world.weapon.melee.Torch;
+import cn.edu.nju.cs.game.world.weapon.throwable.Detonator;
+import cn.edu.nju.cs.game.world.weapon.throwable.DetonatorThrower;
+import cn.edu.nju.cs.game.world.weapon.throwable.ThrowableWeapon;
+
+public class WeaponFactory implements Serializable{
+
+    private Creature master;
+    private List&lt;Weapon&gt; weapons;
+    private Weapon currentWeapon;
+    private int currentWeaponIndex;
+
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} master 主人生物
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L58">    public WeaponFactory(Creature master) {</span>
+<span class="fc" id="L59">        this.master = master;</span>
+<span class="fc" id="L60">        weapons = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L61">        currentWeapon = null;</span>
+<span class="fc" id="L62">        currentWeaponIndex = -1;</span>
+<span class="fc" id="L63">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Creature} 主人
+     * @description: 获取武器工厂的主人
+     */    
+    public Creature master(){
+<span class="fc" id="L71">        return this.master;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Weapon&gt;} 武器列表
+     * @description: 获取武器工厂生成的一系列武器
+     */    
+    public List&lt;Weapon&gt; weapons(){
+<span class="fc" id="L80">        return this.weapons;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 武器数量
+     * @description: 获取武器数量
+     */    
+    public int weaponSize(){
+<span class="fc" id="L89">        return this.weapons().size();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Weapon} 当前武器
+     * @description: 获取当前武器
+     */    
+    public Weapon curWeapon(){
+<span class="fc" id="L98">        return this.currentWeapon;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 开始所有武器的刷新
+     */    
+    public void startAllWeapons(){
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        for(Weapon weapon : weapons){</span>
+<span class="fc" id="L108">            weapon.startRefresh();      // 武器开始刷新</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">            if(weapon instanceof Gun){  // 枪械武器开始刷新子弹</span>
+<span class="nc" id="L110">                Gun gun = (Gun)weapon;</span>
+<span class="nc" id="L111">                gun.startAddBulletTimer();</span>
+<span class="nc" id="L112">            }</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">            else if(weapon instanceof ThrowableWeapon){ // 抛掷类武器开始刷新扔物</span>
+<span class="fc" id="L114">                ThrowableWeapon throwableWeapon = (ThrowableWeapon)weapon;</span>
+<span class="fc" id="L115">                throwableWeapon.startAddItemTimer();</span>
+            }
+<span class="fc" id="L117">        }</span>
+<span class="fc" id="L118">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Tile} 武器形象
+     * @description: 生成随机的武器图片
+     */    
+    public static Tile newRandomWeapon(){
+<span class="fc" id="L126">        Tile randomWeapon = null;</span>
+
+<span class="pc bpc" id="L128" title="1 of 8 branches missed.">        switch (new Random().nextInt(7)) {</span>
+            case 0:
+<span class="fc" id="L130">                randomWeapon = Tile.NORMAL_GUN;</span>
+<span class="fc" id="L131">                break;</span>
+            case 1:
+<span class="fc" id="L133">                randomWeapon = Tile.SHOT_GUN;</span>
+<span class="fc" id="L134">                break;</span>
+            case 2:
+<span class="fc" id="L136">                randomWeapon = Tile.SNIPER_GUN;</span>
+<span class="fc" id="L137">                break;</span>
+            case 3:
+<span class="fc" id="L139">                randomWeapon = Tile.LASER_GUN;</span>
+<span class="fc" id="L140">                break;</span>
+            case 4:
+<span class="fc" id="L142">                randomWeapon = Tile.BASEBALL_BAT;</span>
+<span class="fc" id="L143">                break;</span>
+            case 5:
+<span class="fc" id="L145">                randomWeapon = Tile.DETONATOR_THROWER;</span>
+<span class="fc" id="L146">                break;</span>
+            case 6:
+<span class="fc" id="L148">                randomWeapon = Tile.TORCH;</span>
+                break;
+        }
+
+<span class="fc" id="L152">        return randomWeapon;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Tile} image 武器图片
+     * @return {Weapon} 武器
+     * @description: 根据武器图片生成对应的武器对象
+     */    
+    public void newWeapon(Tile image){
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if(image == null)</span>
+<span class="fc" id="L163">            return;</span>
+<span class="fc bfc" id="L164" title="All 7 branches covered.">        switch (image) {</span>
+            case NORMAL_GUN:
+<span class="fc" id="L166">                this.newNormalGun();</span>
+<span class="fc" id="L167">                break;</span>
+            case SNIPER_GUN:
+<span class="fc" id="L169">                this.newSniperGun();</span>
+<span class="fc" id="L170">                break;</span>
+            case LASER_GUN:
+<span class="fc" id="L172">                this.newLaserGun();</span>
+<span class="fc" id="L173">                break;</span>
+            case SHOT_GUN:
+<span class="fc" id="L175">                this.newShotGun();</span>
+<span class="fc" id="L176">                break;</span>
+            case BASEBALL_BAT:
+<span class="fc" id="L178">                this.newBaseballBat();</span>
+<span class="fc" id="L179">                break;</span>
+            case DETONATOR_THROWER:
+<span class="fc" id="L181">                this.newDetonatorThrower();</span>
+<span class="fc" id="L182">                break;</span>
+            default:
+                break;
+        }
+<span class="fc" id="L186">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成普通枪支
+     */    
+    public void newNormalGun(){
+<span class="fc" id="L194">        this.weapons.add(new NormalGun(this,</span>
+<span class="fc" id="L195">                        new NormalBullet(NormalGun.RANGE, master.direction(), master)</span>
+                        )
+                        );
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if(currentWeapon == null){</span>
+<span class="fc" id="L199">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L200">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L202">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成霰弹枪
+     */    
+    public void newShotGun(){
+<span class="fc" id="L210">        this.weapons.add(new ShotGun(this,</span>
+<span class="fc" id="L211">                        new ShotBullet(ShotGun.RANGE, master.direction(), master)</span>
+                        )
+                        );
+<span class="fc bfc" id="L214" title="All 2 branches covered.">        if(currentWeapon == null){</span>
+<span class="fc" id="L215">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L216">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L218">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成狙击步枪
+     */    
+    public void newSniperGun(){
+<span class="fc" id="L226">        this.weapons.add(new SniperGun(this,</span>
+<span class="fc" id="L227">                        new SniperBullet(SniperGun.RANGE, master.direction(), master)</span>
+                        )
+                        );
+<span class="fc bfc" id="L230" title="All 2 branches covered.">        if(currentWeapon == null){</span>
+<span class="fc" id="L231">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L232">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L234">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成棒球棍
+     */    
+    public void newBaseballBat(){
+<span class="fc" id="L242">        this.weapons.add(new BaseballBat(this,</span>
+                        new Baseball(this.master)
+                        )
+                        );
+<span class="pc bpc" id="L246" title="1 of 2 branches missed.">        if(currentWeapon == null){</span>
+<span class="fc" id="L247">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L248">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L250">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成爆竹投掷器
+     */    
+    public void newDetonatorThrower(){
+<span class="fc" id="L258">        this.weapons.add(new DetonatorThrower(this,</span>
+                        new Detonator(this.master))
+                        );
+<span class="fc bfc" id="L261" title="All 2 branches covered.">        if(currentWeapon == null){</span>
+<span class="fc" id="L262">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L263">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L265">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成激光枪
+     */    
+    public void newLaserGun(){
+<span class="fc" id="L273">        this.weapons.add(new LaserGun(this,</span>
+<span class="fc" id="L274">                        new LaserBeam(0, 0, master.direction(), master))</span>
+                        );
+<span class="fc bfc" id="L276" title="All 2 branches covered.">        if(currentWeapon == null){</span>
+<span class="fc" id="L277">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L278">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L280">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成炸弹手套
+     */    
+    public void newBombGlove(){
+<span class="fc" id="L288">        this.weapons.add(new BombGlove(this));</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if(currentWeapon == null){</span>
+<span class="fc" id="L290">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L291">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L293">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 生成火炬
+     */    
+    public void newTorch(){
+<span class="fc" id="L301">        this.weapons.add(new Torch(this));</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">        if(currentWeapon == null){</span>
+<span class="fc" id="L303">            currentWeapon = weapons.get(0);</span>
+<span class="fc" id="L304">            currentWeaponIndex = 0;</span>
+        }
+<span class="fc" id="L306">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 切换武器是否成功
+     * @description: 切换武器
+     */    
+    public boolean switchWeapon(){
+<span class="fc bfc" id="L314" title="All 2 branches covered.">        if(this.weapons.isEmpty()){  //0个</span>
+<span class="fc" id="L315">            currentWeaponIndex = -1;</span>
+<span class="fc" id="L316">            currentWeapon = null;</span>
+<span class="fc" id="L317">            return false;</span>
+        }
+
+<span class="fc bfc" id="L320" title="All 2 branches covered.">        if(this.weapons.size() == 1){//1个</span>
+<span class="fc" id="L321">            currentWeaponIndex = 0;</span>
+<span class="fc" id="L322">            currentWeapon = this.weapons.get(0);</span>
+<span class="fc" id="L323">            return false;</span>
+        }
+
+<span class="fc" id="L326">        Weapon oldWeapon = this.currentWeapon;</span>
+
+<span class="fc bfc" id="L328" title="All 2 branches covered.">        if(currentWeaponIndex &gt;= this.weapons.size()-1)</span>
+<span class="fc" id="L329">            currentWeaponIndex = 0;</span>
+        else
+<span class="fc" id="L331">            currentWeaponIndex++;</span>
+
+<span class="fc" id="L333">        currentWeapon = this.weapons.get(currentWeaponIndex);</span>
+
+<span class="pc bpc" id="L335" title="1 of 4 branches missed.">        if(this.currentWeapon instanceof Torch &amp;&amp; !(oldWeapon instanceof Torch)){ // 从别的武器切到火炬</span>
+<span class="fc" id="L336">            Torch torch = (Torch)(this.currentWeapon);</span>
+<span class="fc" id="L337">            this.master().visionRadiusUpgrade(torch.range());</span>
+<span class="fc" id="L338">        }</span>
+<span class="pc bpc" id="L339" title="1 of 4 branches missed.">        else if(!(this.currentWeapon instanceof Torch) &amp;&amp; oldWeapon instanceof Torch){// 从火炬切换为别的武器</span>
+<span class="fc" id="L340">            Torch torch = (Torch)(oldWeapon);</span>
+<span class="fc" id="L341">            this.master().visionRadiusUpgrade(-torch.range());</span>
+        }
+
+<span class="fc" id="L344">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

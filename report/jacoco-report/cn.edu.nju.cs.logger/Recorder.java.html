@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Recorder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.logger</a> &gt; <span class="el_source">Recorder.java</span></div><h1>Recorder.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-12-03 16:30:43
+ * @LastEditTime: 2023-01-16 21:10:24
+ * @LastEditors: Xu YangXin
+ * @Description: 此类用于记录，包括保存地图、保存游戏快照、录制。
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\logger\Recorder.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.logger;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import cn.edu.nju.cs.game.screen.PlayScreen;
+import cn.edu.nju.cs.game.world.item.Map;
+import cn.edu.nju.cs.game.world.item.World;
+
+public class Recorder implements Serializable{
+    private List&lt;PlayScreen&gt; playScreens;
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L55">    public Recorder(){</span>
+<span class="fc" id="L56">        this.playScreens = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;PlayScreen&gt;} 游戏界面的列表
+     * @description: 获取连续多帧的游戏界面的列表
+     */    
+    public List&lt;PlayScreen&gt; playScreens(){
+<span class="fc" id="L65">        return this.playScreens;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {PlayScreen} snapShotPlayScreen 要保存的游戏界面快照
+     * @return {*}
+     * @description: 将目标游戏界面保存到本地文件中
+     */    
+    public void saveSnapShot(PlayScreen snapShotPlayScreen){
+        try {
+<span class="fc" id="L76">            this.playScreens.add(Recorder.clone(snapShotPlayScreen));</span>
+<span class="nc" id="L77">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L78">            e.printStackTrace();</span>
+<span class="nc" id="L79">        } catch (IOException e){</span>
+<span class="nc" id="L80">            e.printStackTrace();</span>
+<span class="pc" id="L81">        }</span>
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {World} world 目标世界
+     * @return {*}
+     * @description: 将目标世界写入本地文件中
+     */    
+    public static void writeWorld(World world)
+    throws IOException, ClassNotFoundException {
+<span class="fc" id="L92">        Date date = new Date(System.currentTimeMillis());</span>
+<span class="fc" id="L93">		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(&quot;_yyyy-MM-dd_HH-mm-ss&quot;);</span>
+<span class="fc" id="L94">		String timeString = simpleDateFormat.format(date);</span>
+
+<span class="fc" id="L96">        File file=new File(&quot;./src/main/resources/world/World&quot;+timeString+&quot;.txt&quot;);</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if(!file.exists()){</span>
+            try {
+<span class="fc" id="L99">                file.createNewFile();</span>
+<span class="nc" id="L100">            } catch (IOException e) {</span>
+<span class="nc" id="L101">                e.printStackTrace();</span>
+<span class="fc" id="L102">            }</span>
+        }
+<span class="fc" id="L104">        FileOutputStream fileOutputStream = new FileOutputStream(file);</span>
+<span class="fc" id="L105">        ObjectOutputStream  ObjectOutputStream  = new ObjectOutputStream(fileOutputStream);</span>
+<span class="fc" id="L106">        ObjectOutputStream.writeObject(world.map());</span>
+<span class="fc" id="L107">        ObjectOutputStream.flush();</span>
+<span class="fc" id="L108">        ObjectOutputStream.close();</span>
+<span class="fc" id="L109">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} worldName 保存的世界文件名
+     * @return {World} 得到的世界
+     * @description: 读取本地文件并转换成世界对象
+     */    
+    public static World readWorld(String worldName)
+    throws IOException, ClassNotFoundException {
+<span class="fc" id="L119">        FileInputStream fileInputStream = new FileInputStream(&quot;./src/main/resources/world/&quot;+worldName + &quot;.txt&quot;);</span>
+<span class="fc" id="L120">        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);</span>
+<span class="fc" id="L121">        Map map = (Map) objectInputStream.readObject();</span>
+<span class="fc" id="L122">        objectInputStream.close();</span>
+<span class="fc" id="L123">        return new World(map);</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {PlayScreen} playScreen 目标游戏界面
+     * @return {*}
+     * @description: 将某一帧游戏界面快照并保存到本地文件中
+     */    
+    public static void snapShot(PlayScreen playScreen)
+    throws IOException, ClassNotFoundException {
+<span class="fc" id="L134">        Date date = new Date(System.currentTimeMillis());</span>
+<span class="fc" id="L135">        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(&quot;_yyyy-MM-dd_HH-mm-ss&quot;);</span>
+<span class="fc" id="L136">        String timeString = simpleDateFormat.format(date);</span>
+
+<span class="fc" id="L138">        File file=new File(&quot;./src/main/resources/snapShot/SnapShot&quot;+timeString+&quot;.txt&quot;);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if(!file.exists()){</span>
+            try {
+<span class="fc" id="L141">                file.createNewFile();</span>
+<span class="nc" id="L142">            } catch (IOException e) {</span>
+<span class="nc" id="L143">                e.printStackTrace();</span>
+<span class="fc" id="L144">            }</span>
+        }
+<span class="fc" id="L146">        FileOutputStream fileOutputStream = new FileOutputStream(file);</span>
+<span class="fc" id="L147">        ObjectOutputStream  ObjectOutputStream  = new ObjectOutputStream(fileOutputStream);</span>
+<span class="fc" id="L148">        ObjectOutputStream.writeObject(playScreen);</span>
+<span class="fc" id="L149">        ObjectOutputStream.flush();</span>
+<span class="fc" id="L150">        ObjectOutputStream.close();</span>
+<span class="fc" id="L151">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} snapShotName 本地游戏界面快照文件名
+     * @return {PlayScreen}
+     * @description: 读取本地游戏界面快照文件并转换成游戏界面
+     */    
+    public static PlayScreen readSnapShot(String snapShotName)
+    throws IOException, ClassNotFoundException {
+<span class="fc" id="L161">        FileInputStream fileInputStream = new FileInputStream(&quot;./src/main/resources/snapShot/&quot;+snapShotName+&quot;.txt&quot;);</span>
+<span class="fc" id="L162">        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);</span>
+<span class="fc" id="L163">        PlayScreen playScreen = (PlayScreen) objectInputStream.readObject();</span>
+<span class="fc" id="L164">        objectInputStream.close();</span>
+<span class="fc" id="L165">        return new PlayScreen(playScreen);</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Recorder} recorder 录制器
+     * @return {*}
+     * @description: 将包含多帧的游戏界面的游戏录制内容保存到本地文件
+     */    
+    public static void writeRecorder(Recorder recorder)
+    throws IOException, ClassNotFoundException {
+<span class="fc" id="L176">        Date date = new Date(System.currentTimeMillis());</span>
+<span class="fc" id="L177">        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(&quot;_yyyy-MM-dd_HH-mm-ss&quot;);</span>
+<span class="fc" id="L178">        String timeString = simpleDateFormat.format(date);</span>
+
+<span class="fc" id="L180">        File file=new File(&quot;./src/main/resources/record/Record&quot;+timeString+&quot;.txt&quot;);</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">        if(!file.exists()){</span>
+            try {
+<span class="fc" id="L183">                file.createNewFile();</span>
+<span class="nc" id="L184">            } catch (IOException e) {</span>
+<span class="nc" id="L185">                e.printStackTrace();</span>
+<span class="fc" id="L186">            }</span>
+        }
+<span class="fc" id="L188">        FileOutputStream fileOutputStream = new FileOutputStream(file);</span>
+<span class="fc" id="L189">        ObjectOutputStream  ObjectOutputStream  = new ObjectOutputStream(fileOutputStream);</span>
+<span class="fc" id="L190">        ObjectOutputStream.writeObject(recorder);</span>
+<span class="fc" id="L191">        ObjectOutputStream.flush();</span>
+<span class="fc" id="L192">        ObjectOutputStream.close();</span>
+<span class="fc" id="L193">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {String} recorderName 本地录制文件名称
+     * @return {*}
+     * @description: 读取本地录制文件并转换成录制器
+     */    
+    public static Recorder readRecorder(String recorderName)
+    throws IOException, ClassNotFoundException {
+<span class="fc" id="L203">        FileInputStream fileInputStream = new FileInputStream(&quot;./src/main/resources/record/&quot;+recorderName+&quot;.txt&quot;);</span>
+<span class="fc" id="L204">        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);</span>
+<span class="fc" id="L205">        Recorder recorder = (Recorder) objectInputStream.readObject();</span>
+<span class="fc" id="L206">        objectInputStream.close();</span>
+<span class="fc" id="L207">        return recorder;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {T} 目标对象
+     * @description: 对某个对象进行深拷贝
+     */    
+    public static &lt;T extends Serializable&gt; T clone(T obj)
+    throws IOException, ClassNotFoundException {
+<span class="fc" id="L217">        ByteArrayOutputStream bout = new ByteArrayOutputStream();</span>
+<span class="fc" id="L218">        ObjectOutputStream oos = new ObjectOutputStream(bout);</span>
+<span class="fc" id="L219">        oos.writeObject(obj);</span>
+
+<span class="fc" id="L221">        ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());</span>
+<span class="fc" id="L222">        ObjectInputStream ois = new ObjectInputStream(bin);</span>
+<span class="fc" id="L223">        return (T) ois.readObject();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

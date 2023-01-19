@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Weapon.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon</a> &gt; <span class="el_source">Weapon.java</span></div><h1>Weapon.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-16 21:34:52
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为武器类，是所有武器的抽象基类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\Weapon.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import cn.edu.nju.cs.game.world.item.Tile;
+
+import java.awt.Color;
+import java.io.Serializable;
+
+public abstract class Weapon implements Attack, Serializable{
+    protected WeaponFactory factory;// 生产此武器的工厂
+    protected String name;// 武器的名称
+    private Tile image;
+    private char glyph;
+    private Color color;
+    protected int attackValue;  // 武器的攻击力，远程武器则表示子弹的攻击力
+    protected int range;// 武器的范围，近战武器表示攻击范围，远程武器代表射程
+    protected int coldingInterval;// 武器的冷却时间，单位为毫秒
+    protected boolean active;// 武器可用性
+    transient protected Timer refreshTimer;
+    protected int maxEnergy; // 能量上限
+    protected int curEnergy; // 当前能量值
+
+    /**
+     * @author: Xu YangXin
+     * @param {WeaponFactory} factory 武器工厂
+     * @param {String} name 武器名称
+     * @param {Tile} image 武器图片
+     * @param {int} attackValue 武器攻击力
+     * @param {int} range 武器攻击范围
+     * @param {int} coldingInterval 武器冷却周期
+     * @param {int} maxEnergy 能量上限
+     * @return {*}
+     * @description: 构造器
+     */
+    public Weapon(WeaponFactory factory, String name, Tile image,
+<span class="fc" id="L64">                int attackValue, int range, int coldingInterval, int maxEnergy){</span>
+<span class="fc" id="L65">        this.factory = factory;</span>
+<span class="fc" id="L66">        this.name = name;</span>
+<span class="fc" id="L67">        this.image = image;</span>
+<span class="fc" id="L68">        this.glyph = image.glyph();</span>
+<span class="fc" id="L69">        this.color = image.color();</span>
+<span class="fc" id="L70">        this.attackValue = attackValue;</span>
+<span class="fc" id="L71">        this.range = range;</span>
+<span class="fc" id="L72">        this.coldingInterval = coldingInterval;</span>
+<span class="fc" id="L73">        this.active = true; // 武器可以攻击</span>
+<span class="fc" id="L74">        this.maxEnergy = maxEnergy;</span>
+<span class="fc" id="L75">        this.curEnergy = 0; // 武器的能量值初始化为0</span>
+
+<span class="fc" id="L77">        startRefresh();</span>
+<span class="fc" id="L78">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {WeaponFactory} 武器工厂
+     * @description: 获取生产此武器的工厂
+     */    
+    public WeaponFactory factory(){
+<span class="fc" id="L86">        return this.factory;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {String} 武器名称
+     * @description: 获取武器名称
+     */    
+    public String name(){
+<span class="fc" id="L95">        return this.name;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Tile} 武器形象
+     * @description: 获取武器形象
+     */    
+    public Tile image(){
+<span class="fc" id="L104">        return this.image;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {char} 武器字符
+     * @description: 获取武器字符
+     */    
+    public char glyph(){
+<span class="fc" id="L113">        return this.glyph;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Color} 武器颜色
+     * @description: 获取武器颜色
+     */    
+    public Color color(){
+<span class="fc" id="L122">        return this.color;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 武器的攻击力
+     * @description: 获取武器的攻击力
+     */    
+    public int attackValue(){
+<span class="fc" id="L131">        return this.attackValue;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 武器的攻击范围
+     * @description: 获取武器的攻击范围
+     */    
+    public int range(){
+<span class="fc" id="L140">        return this.range;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 武器的冷却周期
+     * @description: 获取武器的冷却周期
+     */    
+    public int coldingInterval(){
+<span class="nc" id="L149">        return this.coldingInterval;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 武器是否可使用
+     * @description: 查看武器是否可使用
+     */    
+    synchronized public boolean isActive(){
+<span class="fc" id="L158">        return this.active;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {boolean} active 武器可用性
+     * @return {}
+     * @description: 设置武器可用性
+     */    
+    synchronized public void setActive(boolean active){
+<span class="fc" id="L168">        this.active = active;</span>
+<span class="fc" id="L169">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 武器的最大能量值
+     * @description: 获取武器的最大能力值
+     */    
+    public int maxEnergy(){
+<span class="fc" id="L177">        return this.maxEnergy;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 武器的当前能力值
+     * @description: 获取武器的当前能力值
+     */    
+    public int curEnergy(){
+<span class="fc" id="L186">        return this.curEnergy;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 武器当前是否可以释放大招
+     * @description: 查看武器当前是否可以释放大招
+     */    
+    public boolean bigAttackActive(){
+<span class="nc bnc" id="L195" title="All 2 branches missed.">        return this.curEnergy &gt;= this.maxEnergy;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 给武器充能一次
+     */    
+    public void chargeEnergy(){
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if(this.curEnergy &lt; this.maxEnergy)</span>
+<span class="fc" id="L205">            this.curEnergy++;</span>
+<span class="fc" id="L206">        return;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 清空武器能量
+     */    
+    public void clearEnergy(){
+<span class="nc" id="L215">        this.curEnergy = 0;</span>
+<span class="nc" id="L216">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 武器开始刷新
+     */    
+    public void startRefresh(){
+        // 周期性刷新武器可用性
+<span class="fc" id="L225">        refreshTimer = new Timer();</span>
+<span class="fc" id="L226">        refreshTimer.schedule(</span>
+<span class="fc" id="L227">            new TimerTask() {</span>
+                public void run() {
+<span class="fc bfc" id="L229" title="All 2 branches covered.">                    if(factory().master().world().worldIsPaused())</span>
+<span class="fc" id="L230">                        return;</span>
+<span class="fc" id="L231">                    setActive(true);</span>
+<span class="fc" id="L232">                }</span>
+            }, coldingInterval , coldingInterval);
+<span class="fc" id="L234">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

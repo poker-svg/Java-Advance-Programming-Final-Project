@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>World.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.item</a> &gt; <span class="el_source">World.java</span></div><h1>World.java</h1><pre class="source lang-java linenums">package cn.edu.nju.cs.game.world.item;
+
+import java.awt.Color;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.creature.bros.*;
+import cn.edu.nju.cs.game.world.creature.goblins.*;
+import cn.edu.nju.cs.game.world.weapon.bomb.Bomb;
+import cn.edu.nju.cs.game.world.weapon.gun.Bullet;
+import cn.edu.nju.cs.game.world.weapon.melee.AttackDot;
+import cn.edu.nju.cs.game.world.weapon.throwable.ThrowableItem;
+
+public class World implements Serializable{
+    public static final int TILE_TYPES = 2;
+
+    private Map map;
+    private volatile boolean world_pause_flag;
+    private List&lt;Creature&gt; creatures;
+    private List&lt;Goblin&gt; goblins;
+    private List&lt;Player&gt; players;
+    private List&lt;Bomb&gt; bombs;
+    private List&lt;Bullet&gt; bullets;
+    private List&lt;AttackDot&gt; attackDots;
+    private List&lt;ThrowableItem&gt; throwableItems;
+
+    /**
+     * @author: Xu YangXin
+     * @param {Tile[][]} tiles 地形的二维数组
+     * @param {DoorPairs} doorPairs 传送门对
+     * @param {Grasses} grasses 草丛
+     * @param {Boxes} boxes 宝箱
+     * @param {FirePiles} firePiles 火堆
+     * @return {*}
+     * @description: 构造器
+     */
+<span class="fc" id="L39">    public World(Tile[][] tiles, DoorPairs doorPairs, Grasses grasses, Boxes boxes, FirePiles firePiles) {</span>
+<span class="fc" id="L40">        this.map = new Map(tiles, doorPairs, grasses, boxes, firePiles);</span>
+<span class="fc" id="L41">        this.creatures = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L42">        this.goblins = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L43">        this.players = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L44">        this.bombs = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L45">        this.bullets = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L46">        this.attackDots = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L47">        this.throwableItems = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L48">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {Map} otherMap 地图
+     * @return {*}
+     * @description: 构造器
+     */    
+<span class="fc" id="L56">    public World(Map otherMap){</span>
+<span class="fc" id="L57">        this.map = otherMap;</span>
+<span class="fc" id="L58">        this.world_pause_flag = false;</span>
+<span class="fc" id="L59">        this.creatures = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L60">        this.goblins = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L61">        this.players = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L62">        this.bombs = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L63">        this.bullets = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L64">        this.attackDots = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L65">        this.throwableItems = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L66">    }</span>
+
+
+    /**
+     * @author: Xu YangXin
+     * @return {Map} 地图
+     * @description: 获取世界的地图
+     */    
+<span class="fc" id="L74">    public Map map(){ return this.map;}</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {DoorPairs} 传送门对
+     * @description: 获取世界的所有传送门对
+     */    
+<span class="fc" id="L81">    public DoorPairs doorPairs(){ return this.map.doorPairs();}</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {Grasses} 草丛
+     * @description: 获取世界的所有草丛
+     */    
+<span class="fc" id="L88">    public Grasses grasses(){ return this.map.grasses();}</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {Boxes} 宝箱
+     * @description: 获取世界的所有宝箱
+     */    
+<span class="fc" id="L95">    public Boxes boxes(){ return this.map.boxes(); }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {FirePiles} 火堆
+     * @description: 获取世界的所有火堆
+     */    
+<span class="fc" id="L102">    public FirePiles firePiles(){ return this.map.firePiles(); }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 重启世界，让世界动起来
+     */    
+    public void resetWorld(){
+<span class="fc" id="L110">        this.world_pause_flag = false;</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        for(Creature creature: this.creatures)</span>
+<span class="fc" id="L112">            creature.startMove();</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        for(Player player : this.players)</span>
+<span class="fc" id="L114">            player.weaponFactory().startAllWeapons();</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        for(Goblin goblin : this.goblins)</span>
+<span class="fc" id="L116">            goblin.weaponFactory().startAllWeapons();</span>
+
+<span class="fc" id="L118">        this.bombs = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L119">        this.bullets = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L120">        this.attackDots = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L121">        this.throwableItems = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L122">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {Tile} 目标地形
+     * @description: 获取地图的某个坐标上的地形
+     */    
+    public Tile tile(int x, int y) {
+<span class="fc bfc" id="L132" title="All 8 branches covered.">        if (x &lt; 0 || x &gt;= this.map.width() || y &lt; 0 || y &gt;= this.map.height()) {</span>
+<span class="fc" id="L133">            return Tile.BOUNDS;</span>
+        } else {
+<span class="fc" id="L135">            return this.map.tiles()[x][y];</span>
+        }
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {char} 目标地形的字符
+     * @description: 获取地图的某个坐标上的地形的字符
+     */    
+    public char glyph(int x, int y) {
+<span class="fc" id="L147">        return this.map.tiles()[x][y].glyph();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {Color} 目标地形的颜色
+     * @description: 获取地图的某个坐标上的地形的颜色
+     */    
+    public Color color(int x, int y) {
+<span class="fc" id="L158">        return this.map.tiles()[x][y].color();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 地图宽度
+     * @description: 获取地图宽度
+     */    
+    public int width() {
+<span class="fc" id="L167">        return this.map.width();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {int} 地图高度
+     * @description: 获取地图高度
+     */    
+    public int height() {
+<span class="fc" id="L176">        return this.map.height();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {boolean} 坐标是否在地图内部
+     * @description: 判断某个坐标是否在地图内部
+     */    
+    public boolean inBound(int x, int y){
+<span class="fc bfc" id="L187" title="All 8 branches covered.">        return x &gt;= 0 &amp;&amp; x &lt; this.map.width() &amp;&amp; y &gt;= 0 &amp;&amp; y &lt; this.map.height();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {*} 
+     * @description: 挖掘某个坐标的地形
+     */    
+    public void dig(int x, int y) {
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        if (tile(x, y).isDiggable()) {</span>
+<span class="nc" id="L199">            this.map.tiles()[x][y] = Tile.FLOOR;</span>
+        }
+<span class="nc" id="L201">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {Tile} targetTile 目标地形
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {boolean} 是否设置地形成功
+     * @description: 将某个地形设置到坐标
+     */    
+    public boolean setThing(Tile targetTile, int x, int y){
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">        if(tile(x, y) == Tile.BOUNDS)</span>
+<span class="nc" id="L213">            return false;</span>
+
+<span class="fc" id="L215">        this.map.tiles()[x][y] = targetTile;</span>
+<span class="fc" id="L216">        return true;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} creature 目标生物
+     * @return {*}
+     * @description: 将某个生物随机设置到地图的某个空区域
+     */    
+    public void addAtEmptyLocation(Creature creature) {
+        int x;
+        int y;
+
+        do {
+<span class="fc" id="L230">            x = (int) (Math.random() * this.map.width());</span>
+<span class="fc" id="L231">            y = (int) (Math.random() * this.map.height());</span>
+<span class="fc bfc" id="L232" title="All 4 branches covered.">        } while (!tile(x, y).isGround() || this.creature(x, y) != null);</span>
+
+<span class="fc" id="L234">        creature.setX(x);</span>
+<span class="fc" id="L235">        creature.setY(y);</span>
+<span class="fc" id="L236">        creature.setWorld(this);</span>
+
+<span class="fc" id="L238">        this.addCreature(creature);</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">        if(creature instanceof Player){</span>
+<span class="fc" id="L240">            Player player = (Player)creature;</span>
+<span class="fc" id="L241">            this.addPlayer(player);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">        }else if(creature instanceof Goblin){</span>
+<span class="fc" id="L243">            Goblin goblin = (Goblin)creature;</span>
+<span class="fc" id="L244">            this.addGoblin(goblin);</span>
+        }
+
+<span class="fc" id="L247">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 更新世界
+     */    
+    public void update() {
+<span class="fc" id="L255">        ArrayList&lt;Creature&gt; toUpdate = new ArrayList&lt;&gt;(this.creatures);</span>
+
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        for (Creature creature : toUpdate) {</span>
+<span class="fc" id="L258">            creature.update();</span>
+<span class="fc" id="L259">        }</span>
+<span class="fc" id="L260">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {Creature} 获取到的生物
+     * @description: 根据坐标获取生物
+     */    
+    public Creature creature(int x, int y) {
+<span class="fc" id="L270">        synchronized(this.creatures){</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">            for (Creature c : this.creatures) {</span>
+<span class="fc bfc" id="L272" title="All 4 branches covered.">                if (c.x() == x &amp;&amp; c.y() == y) {</span>
+<span class="fc" id="L273">                    return c;</span>
+                }
+<span class="fc" id="L275">            }</span>
+<span class="fc" id="L276">        }</span>
+<span class="fc" id="L277">        return null;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Creature&gt;} 生物列表
+     * @description: 获取世界中所有生物的列表
+     */    
+    public List&lt;Creature&gt; getCreatures() {
+<span class="fc" id="L286">        return this.creatures;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} i 生物在列表中的下标
+     * @return {Creature} 目标生物
+     * @description: 获取第i个生物，找不到则返回null
+     */    
+    public Creature getCreatureAt(int i) {
+<span class="fc" id="L296">        Creature ret = null;</span>
+<span class="fc" id="L297">        synchronized(this.creatures){</span>
+<span class="fc" id="L298">            ret = this.creatures.get(i);</span>
+<span class="fc" id="L299">        }</span>
+<span class="fc" id="L300">        return ret;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 生物数量
+     * @description: 获取世界中所有生物的数量
+     */    
+    public int getCreaturesSize() {
+<span class="fc" id="L309">        int s = 0;</span>
+<span class="fc" id="L310">        synchronized(this.creatures){</span>
+<span class="fc" id="L311">            s = this.creatures.size();</span>
+<span class="fc" id="L312">        }</span>
+<span class="fc" id="L313">        return s;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Player&gt;} 玩家列表
+     * @description: 获取世界中的所有玩家的列表
+     */    
+    public List&lt;Player&gt; getPlayers(){
+<span class="fc" id="L322">            return this.players;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} playerIndex 玩家ID
+     * @return {Player}
+     * @description: 根据玩家ID获取目标玩家，获取不了则返回null
+     */    
+    public Player searchPlayer(int playerIndex){
+<span class="pc bpc" id="L332" title="1 of 2 branches missed.">        for(Player player:this.players){</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">            if(player.playerIndex() == playerIndex){</span>
+<span class="fc" id="L334">                return player;</span>
+            }
+<span class="nc" id="L336">        }</span>
+<span class="nc" id="L337">        return null;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Goblin&gt;} 妖精列表
+     * @description:获取世界中的所有妖精的列表
+     */    
+    public List&lt;Goblin&gt; getGoblins(){
+<span class="fc" id="L346">            return this.goblins;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} creature 生物
+     * @return {boolean} 添加生物是否成功
+     * @description: 为世界添加生物
+     */    
+    public boolean addCreature(Creature creature){
+<span class="pc bpc" id="L356" title="1 of 2 branches missed.">        if(creature == null)</span>
+<span class="nc" id="L357">            return false;</span>
+<span class="fc" id="L358">        synchronized(this.creatures){</span>
+<span class="fc" id="L359">            this.creatures.add(creature);</span>
+<span class="fc" id="L360">        }</span>
+<span class="fc" id="L361">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Player} player 玩家
+     * @return {boolean} 添加玩家是否成功
+     * @description: 为世界添加玩家
+     */    
+    public boolean addPlayer(Player player){
+<span class="pc bpc" id="L371" title="1 of 2 branches missed.">        if(player == null)</span>
+<span class="nc" id="L372">            return false;</span>
+<span class="fc" id="L373">        synchronized(this.players){</span>
+<span class="fc" id="L374">            player.setPlayerIndex(this.players.size());</span>
+<span class="fc" id="L375">            this.players.add(player);</span>
+<span class="fc" id="L376">        }</span>
+<span class="fc" id="L377">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Goblin} goblin 妖精
+     * @return {boolean} 添加妖精是否成功
+     * @description: 为世界添加妖精
+     */    
+    public boolean addGoblin(Goblin goblin){
+<span class="pc bpc" id="L387" title="1 of 2 branches missed.">        if(goblin == null)</span>
+<span class="nc" id="L388">            return false;</span>
+<span class="fc" id="L389">        synchronized(this.goblins){</span>
+<span class="fc" id="L390">            this.goblins.add(goblin);</span>
+<span class="fc" id="L391">        }</span>
+<span class="fc" id="L392">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Creature} target 目标生物
+     * @return {*}
+     * @description: 将目标生物移除
+     */    
+    public void remove(Creature target) {
+<span class="pc bpc" id="L402" title="1 of 2 branches missed.">        if(target == null)</span>
+<span class="nc" id="L403">            return;</span>
+<span class="fc" id="L404">        synchronized(this.creatures){</span>
+<span class="fc" id="L405">            this.creatures.remove(target);</span>
+<span class="fc" id="L406">        }</span>
+<span class="fc bfc" id="L407" title="All 2 branches covered.">        if(target instanceof Player){</span>
+<span class="fc" id="L408">            Player player = (Player)target;</span>
+<span class="fc" id="L409">            synchronized(this.players){</span>
+<span class="fc" id="L410">                this.players.remove(player);</span>
+<span class="fc" id="L411">            }</span>
+<span class="pc bpc" id="L412" title="1 of 2 branches missed.">        }else if(target instanceof Goblin){</span>
+<span class="nc" id="L413">            Goblin goblin = (Goblin)target;</span>
+<span class="nc" id="L414">            synchronized(this.goblins){</span>
+<span class="nc" id="L415">                this.goblins.remove(goblin);</span>
+<span class="nc" id="L416">            }</span>
+        }
+<span class="fc" id="L418">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {Bomb} bomb 炸弹
+     * @return {boolean} 添加炸弹是否成功
+     * @description: 为世界添加炸弹
+     */    
+    public boolean addBomb(Bomb bomb){
+<span class="fc" id="L427">        synchronized(this.bombs){</span>
+<span class="fc" id="L428">            this.bombs.add(bomb);</span>
+<span class="fc" id="L429">        }</span>
+<span class="fc" id="L430">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Bomb} target 目标炸弹
+     * @return {*}
+     * @description: 移除目标炸弹
+     */    
+    public void removeBomb(Bomb target) {
+<span class="nc" id="L440">        synchronized(this.bombs){</span>
+<span class="nc" id="L441">            this.bombs.remove(target);</span>
+<span class="nc" id="L442">        }</span>
+<span class="nc" id="L443">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Bomb&gt;} 炸弹列表
+     * @description: 获取世界中的所有炸弹的列表
+     */    
+    public List&lt;Bomb&gt; getBombs(){
+<span class="nc" id="L451">        synchronized(this.bombs){</span>
+<span class="nc" id="L452">            return bombs;</span>
+        }
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} x 目标的x坐标
+     * @param {int} y 目标的y坐标
+     * @return {Bomb} 目标炸弹
+     * @description: 根据坐标获取目标炸弹，找不到则返回bull
+     */    
+    public Bomb getBomb(int x, int y){
+<span class="fc" id="L464">        synchronized(this.bombs){</span>
+<span class="fc bfc" id="L465" title="All 2 branches covered.">            for(Bomb bomb : bombs)</span>
+<span class="fc bfc" id="L466" title="All 4 branches covered.">                if(bomb.x() == x &amp;&amp; bomb.y() == y)</span>
+<span class="fc" id="L467">                    return bomb;</span>
+<span class="fc" id="L468">        }</span>
+<span class="fc" id="L469">        return null;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @return {int} 炸弹数量
+     * @description: 获取世界中所有炸弹的数量
+     */    
+    public int getBombsSize(){
+        int size;
+<span class="fc" id="L479">        synchronized(this.bombs){</span>
+<span class="fc" id="L480">            size = this.bombs.size();</span>
+<span class="fc" id="L481">        }</span>
+<span class="fc" id="L482">        return size;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {int} i 炸弹下标
+     * @return {Bomb} 目标炸弹
+     * @description: 获取炸弹列表的第i个炸弹
+     */    
+    public Bomb getBombAt(int i){
+<span class="fc" id="L492">        Bomb bomb = null;</span>
+<span class="fc" id="L493">        synchronized(this.bombs){</span>
+<span class="fc" id="L494">            bomb = this.bombs.get(i);</span>
+<span class="fc" id="L495">        }</span>
+<span class="fc" id="L496">        return bomb;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Bullet} bullet 子弹
+     * @return {boolean} 添加子弹是否成功
+     * @description: 为世界添加子弹
+     */    
+    public boolean addBullet(Bullet bullet){
+<span class="fc bfc" id="L506" title="All 2 branches covered.">        if(this.inBound(bullet.x(),bullet.y())){</span>
+<span class="fc" id="L507">            synchronized(this.bullets){</span>
+<span class="fc" id="L508">                this.bullets.add(bullet);</span>
+<span class="fc" id="L509">            }</span>
+        }
+<span class="fc" id="L511">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {Bullet} target 目标子弹
+     * @return {*}
+     * @description: 将目标子弹移除
+     */    
+    public void removeBullet(Bullet target) {
+<span class="nc" id="L521">        synchronized(this.bullets){</span>
+<span class="nc" id="L522">            this.bullets.remove(target);</span>
+<span class="nc" id="L523">        }</span>
+<span class="nc" id="L524">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;Bullet&gt;} 子弹列表
+     * @description: 获取世界中所有子弹的列表
+     */    
+    public List&lt;Bullet&gt; getBullets(){
+<span class="fc" id="L532">        synchronized(this.bullets){</span>
+<span class="fc" id="L533">            return this.bullets;</span>
+        }
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {AttackDot} attackDot 攻击点
+     * @return {boolean} 添加攻击点是否成功
+     * @description: 为世界添加一个攻击点
+     */    
+    public boolean addAttackDot(AttackDot attackDot){
+<span class="pc bpc" id="L544" title="1 of 2 branches missed.">        if( !inBound(attackDot.x(), attackDot.y()) ||   // 不在地图范围内</span>
+<span class="fc bfc" id="L545" title="All 2 branches covered.">            !this.tile(attackDot.x(), attackDot.y()).isGround() ) // 撞着墙了</span>
+<span class="fc" id="L546">            return false;</span>
+
+<span class="fc" id="L548">        synchronized(this.attackDots){</span>
+<span class="fc" id="L549">            this.attackDots.add(attackDot);</span>
+<span class="fc" id="L550">        }</span>
+<span class="fc" id="L551">        Runnable runnable = new Runnable() { // 一段时间后删除攻击点</span>
+			public void run() {
+				while (true) {
+					try {
+<span class="fc" id="L555">						Thread.sleep(attackDot.remainTime());</span>
+<span class="nc" id="L556">					} catch (InterruptedException e) {</span>
+<span class="nc" id="L557">						e.printStackTrace();</span>
+<span class="fc" id="L558">					}</span>
+<span class="fc" id="L559">                    removeAttackDot(attackDot);</span>
+				}
+			}
+		};
+<span class="fc" id="L563">		new Thread(runnable).start();</span>
+
+<span class="fc" id="L565">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {List&lt;AttackDot&gt;} attackDots 攻击点列表
+     * @return {boolean} 添加攻击点列表是否成功
+     * @description: 为世界添加一堆攻击点
+     */    
+    public boolean addAttackDot(List&lt;AttackDot&gt; attackDots){
+<span class="fc bfc" id="L575" title="All 2 branches covered.">        for (AttackDot attackDot : attackDots) {</span>
+<span class="fc" id="L576">            this.addAttackDot(attackDot);</span>
+<span class="fc" id="L577">        }</span>
+<span class="fc" id="L578">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {AttackDot} target 目标攻击点
+     * @return {*}
+     * @description: 将目标攻击点移除
+     */    
+    public void removeAttackDot(AttackDot target) {
+<span class="fc" id="L588">        synchronized(this.attackDots){</span>
+<span class="fc" id="L589">            this.attackDots.remove(target);</span>
+<span class="fc" id="L590">        }</span>
+<span class="fc" id="L591">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;AttackDot&gt;} 攻击点列表
+     * @description: 获取世界中所有攻击点的列表
+     */    
+    public List&lt;AttackDot&gt; getAttackDots(){
+<span class="fc" id="L599">        synchronized(this.attackDots){</span>
+<span class="fc" id="L600">            return this.attackDots;</span>
+        }
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {ThrowableItem} throwableItem 投掷物品
+     * @return {boolean} 添加投掷物品是否成功
+     * @description: 为世界添加投掷物品
+     */    
+    public boolean addThrowableItem(ThrowableItem throwableItem){
+<span class="fc" id="L611">        synchronized(this.throwableItems){</span>
+<span class="fc" id="L612">            this.throwableItems.add(throwableItem);</span>
+<span class="fc" id="L613">            Runnable runnable = new Runnable() {</span>
+                public void run() {
+                    try {
+<span class="nc" id="L616">                        Thread.sleep(throwableItem.activateInterval());</span>
+<span class="nc" id="L617">                    } catch (InterruptedException e) {</span>
+<span class="nc" id="L618">                        e.printStackTrace();</span>
+<span class="nc" id="L619">                    }</span>
+<span class="nc" id="L620">                    throwableItem.activate();</span>
+<span class="nc" id="L621">                }</span>
+            };
+<span class="fc" id="L623">            new Thread(runnable).start();</span>
+<span class="fc" id="L624">        }</span>
+<span class="fc" id="L625">        return true;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {ThrowableItem} target 投目标投掷物品
+     * @return {*}
+     * @description: 将目标投掷物品移除
+     */    
+    public void removeThrowableItem(ThrowableItem target) {
+<span class="nc" id="L635">        synchronized(this.throwableItems){</span>
+<span class="nc" id="L636">            this.throwableItems.remove(target);</span>
+<span class="nc" id="L637">        }</span>
+<span class="nc" id="L638">    }</span>
+    
+    /**
+     * @author: Xu YangXin
+     * @return {List&lt;ThrowableItem&gt;} 投掷物品列表
+     * @description: 获取世界中的所有投掷物品的列表
+     */    
+    public List&lt;ThrowableItem&gt; getThrowableItems(){
+<span class="fc" id="L646">        synchronized(this.throwableItems){</span>
+<span class="fc" id="L647">            return throwableItems;</span>
+        }
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 世界是否暂停
+     * @description: 查看世界是否停止
+     */    
+    synchronized public boolean worldIsPaused(){
+<span class="fc" id="L657">        return world_pause_flag;</span>
+    }
+    
+    /**
+     * @author: Xu YangXin
+     * @param {boolean} flag 世界暂停的标志
+     * @return {*}
+     * @description: 设置世界是否暂停
+     */    
+    synchronized public void setWorldPauseFlag(boolean flag){
+<span class="fc" id="L667">        world_pause_flag = flag;</span>
+<span class="fc" id="L668">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

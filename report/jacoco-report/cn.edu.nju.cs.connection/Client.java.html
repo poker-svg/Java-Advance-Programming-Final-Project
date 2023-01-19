@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Client.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.connection</a> &gt; <span class="el_source">Client.java</span></div><h1>Client.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2023-01-06 14:42:44
+ * @LastEditTime: 2023-01-16 10:24:37
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为客户端用于和服务器进行交互的代理类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\connection\Client.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.connection;
+
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.awt.event.KeyEvent;
+
+import cn.edu.nju.cs.game.screen.PlayScreen;
+
+public class Client {
+    private int roomAddr;
+    private int playerIndex;
+    public int roomAddr(){
+<span class="nc" id="L43">        return this.roomAddr;</span>
+    }
+    public int playerIndex(){
+<span class="nc" id="L46">        return this.playerIndex;</span>
+    }
+
+    private Message connectMessage;
+    private Message enterRoomMessage;
+    private Message addRoomMessage;
+    private Message loadRoomMessage;
+    private Message getLatestRoomMessage;
+    private Message moveLeftMessage;
+    private Message moveRightMessage;
+    private Message moveDownMessage;
+    private Message moveUpMessage;
+    private Message setBombMessage;
+    private Message attackMessage;
+    private Message bigAttackMessage ;
+    private Message switchWeaponMessage;
+    private Message throwableWeaponMoveUpMessage;
+    private Message throwableWeaponMoveDownMessage;
+    private Message throwableWeaponMoveLeftMessage;
+    private Message throwableWeaponMoveRightMessage;
+    private Message pauseWorldMessage;
+    private Message recoverWorldMessage;
+
+<span class="fc" id="L69">    public Client(){</span>
+        
+<span class="fc" id="L71">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} roomAddr 房间地址
+     * @param {String} playerName 玩家姓名
+     * @param {PlayScreen} playScreen 目标房间
+     * @return {*}
+     * @description: 此构造器用于玩家开始新游戏时的配置
+     */
+<span class="nc" id="L81">    public Client(int roomAddr, String playerName, PlayScreen playScreen){</span>
+<span class="nc" id="L82">        playScreen.setPlayer(playScreen.creatureFactory().newPlayer(playScreen.messages(), playerName));</span>
+
+<span class="nc" id="L84">        this.connectMessage = new Message(null, null, -1, roomAddr, Message.CONNECT_MESSAGE);</span>
+<span class="nc" id="L85">        this.enterRoomMessage = new Message(null, playerName, -1, roomAddr, Message.ENTER_ROOM_MESSAGE);</span>
+<span class="nc" id="L86">        this.addRoomMessage = new Message(playScreen, null, -1, roomAddr, Message.ADD_ROOM_MESSAGE);</span>
+
+<span class="nc" id="L88">        this.connectRoom();</span>
+
+<span class="nc" id="L90">        this.getLatestRoomMessage = new Message(null, null, this.playerIndex, roomAddr, Message.GET_LATEST_ROOM_MESSAGE);</span>
+<span class="nc" id="L91">        this.moveLeftMessage = new Message(null, null, this.playerIndex, roomAddr, Message.MOVE_LEFT_MESSAGE);</span>
+<span class="nc" id="L92">        this.moveRightMessage = new Message(null, null, this.playerIndex, roomAddr, Message.MOVE_RIGHT_MESSAGE);</span>
+<span class="nc" id="L93">        this.moveDownMessage = new Message(null, null, this.playerIndex, roomAddr, Message.MOVE_DOWN_MESSAGE);</span>
+<span class="nc" id="L94">        this.moveUpMessage = new Message(null, null, this.playerIndex, roomAddr, Message.MOVE_UP_MESSAGE);</span>
+<span class="nc" id="L95">        this.setBombMessage = new Message(null, null, this.playerIndex, roomAddr, Message.SET_BOMB_MESSAGE);</span>
+<span class="nc" id="L96">        this.attackMessage = new Message(null, null, this.playerIndex, roomAddr, Message.ATTACK_MESSAGE);</span>
+<span class="nc" id="L97">        this.bigAttackMessage = new Message(null, null, this.playerIndex, roomAddr, Message.BIG_ATTACK_MESSAGE);</span>
+<span class="nc" id="L98">        this.switchWeaponMessage = new Message(null, null, this.playerIndex, roomAddr, Message.SWITCH_WEAPON_MESSAGE);</span>
+<span class="nc" id="L99">        this.throwableWeaponMoveUpMessage = new Message(null, null, this.playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_UP_MESSAGE);</span>
+<span class="nc" id="L100">        this.throwableWeaponMoveDownMessage = new Message(null, null, this.playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_DOWN_MESSAGE);</span>
+<span class="nc" id="L101">        this.throwableWeaponMoveLeftMessage = new Message(null, null, this.playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_LEFT_MESSAGE);</span>
+<span class="nc" id="L102">        this.throwableWeaponMoveRightMessage = new Message(null, null, this.playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_RIGHT_MESSAGE);</span>
+<span class="nc" id="L103">        this.pauseWorldMessage = new Message(null, null, this.playerIndex, roomAddr, Message.WORLD_PAUSE_MESSAGE);</span>
+<span class="nc" id="L104">        this.recoverWorldMessage = new Message(null, null, this.playerIndex, roomAddr, Message.WORLD_RECOVER_MESSAGE);</span>
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {int} roomAddr 房间地址
+     * @param {int} playerIndex 玩家下标
+     * @param {PlayScreen} playScreen 目标房间
+     * @return {*}
+     * @description: 此构造其用于玩家加载保存房间时的配置
+     */
+<span class="nc" id="L115">    public Client(int roomAddr, int playerIndex, PlayScreen playScreen){</span>
+<span class="nc" id="L116">        this.loadRoomMessage = new Message(playScreen, null, playerIndex, roomAddr, Message.LOAD_ROOM_MESSAGE);</span>
+
+<span class="nc" id="L118">        this.loadRoom();</span>
+
+<span class="nc" id="L120">        this.getLatestRoomMessage = new Message(null, null, playerIndex, roomAddr, Message.GET_LATEST_ROOM_MESSAGE);</span>
+<span class="nc" id="L121">        this.moveLeftMessage = new Message(null, null, playerIndex, roomAddr, Message.MOVE_LEFT_MESSAGE);</span>
+<span class="nc" id="L122">        this.moveRightMessage = new Message(null, null, playerIndex, roomAddr, Message.MOVE_RIGHT_MESSAGE);</span>
+<span class="nc" id="L123">        this.moveDownMessage = new Message(null, null, playerIndex, roomAddr, Message.MOVE_DOWN_MESSAGE);</span>
+<span class="nc" id="L124">        this.moveUpMessage = new Message(null, null, playerIndex, roomAddr, Message.MOVE_UP_MESSAGE);</span>
+<span class="nc" id="L125">        this.setBombMessage = new Message(null, null, playerIndex, roomAddr, Message.SET_BOMB_MESSAGE);</span>
+<span class="nc" id="L126">        this.attackMessage = new Message(null, null, playerIndex, roomAddr, Message.ATTACK_MESSAGE);</span>
+<span class="nc" id="L127">        this.bigAttackMessage = new Message(null, null, playerIndex, roomAddr, Message.BIG_ATTACK_MESSAGE);</span>
+<span class="nc" id="L128">        this.switchWeaponMessage = new Message(null, null, playerIndex, roomAddr, Message.SWITCH_WEAPON_MESSAGE);</span>
+<span class="nc" id="L129">        this.throwableWeaponMoveUpMessage = new Message(null, null, playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_UP_MESSAGE);</span>
+<span class="nc" id="L130">        this.throwableWeaponMoveDownMessage = new Message(null, null, playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_DOWN_MESSAGE);</span>
+<span class="nc" id="L131">        this.throwableWeaponMoveLeftMessage = new Message(null, null, playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_LEFT_MESSAGE);</span>
+<span class="nc" id="L132">        this.throwableWeaponMoveRightMessage = new Message(null, null, playerIndex, roomAddr, Message.THROWABLE_WEAPON_MOVE_RIGHT_MESSAGE);</span>
+<span class="nc" id="L133">        this.pauseWorldMessage = new Message(null, null, playerIndex, roomAddr, Message.WORLD_PAUSE_MESSAGE);</span>
+<span class="nc" id="L134">        this.recoverWorldMessage = new Message(null, null, playerIndex, roomAddr, Message.WORLD_RECOVER_MESSAGE);</span>
+<span class="nc" id="L135">    }</span>
+
+
+    /**
+     * @author: Xu YangXin
+     * @return {Message} 服务器响应的消息
+     * @description: 连接服务器的目标房间，若房间不存在则将目标房间保存到服务器上
+     */
+    public Message connectRoom(){
+<span class="nc" id="L144">        Message messageFromServer = this.sendMessage(this.connectMessage);</span>
+
+        // 房间存在
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if(messageFromServer.playScreen() != null){</span>
+<span class="nc" id="L148">            messageFromServer = this.sendMessage(this.enterRoomMessage);</span>
+        }
+        // 房间不存在
+        else{
+<span class="nc" id="L152">            messageFromServer = this.sendMessage(this.addRoomMessage);</span>
+        }
+<span class="nc" id="L154">        this.roomAddr = messageFromServer.roomAddr();</span>
+<span class="nc" id="L155">        this.playerIndex = messageFromServer.playerIndex();</span>
+<span class="nc" id="L156">        return messageFromServer;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {Message} 服务器响应的消息
+     * @description: 加载玩家保存在本地的房间，并将目标房间发到服务器上
+     */
+    public Message loadRoom(){
+<span class="nc" id="L165">        Message messageFromServer = this.sendMessage(this.loadRoomMessage);</span>
+<span class="nc" id="L166">        this.roomAddr = messageFromServer.roomAddr();</span>
+<span class="nc" id="L167">        this.playerIndex = messageFromServer.playerIndex();</span>
+<span class="nc" id="L168">        return messageFromServer;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @return {PlayScreen} 服务器上的目标房间
+     * @description: 获取服务器上目标房间的最新状态
+     */
+    public PlayScreen getLatestRoom(){
+<span class="nc" id="L177">        Message messageFromServer = this.sendMessage(this.getLatestRoomMessage);</span>
+<span class="nc" id="L178">        return messageFromServer.playScreen();</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {KeyEvent} key 玩家按下的按键
+     * @return {*}
+     * @description: 处理玩家按下的按键，将对应的操作消息发送给服务器
+     */
+    public void operation(KeyEvent key){
+<span class="nc bnc" id="L188" title="All 14 branches missed.">        switch (key.getKeyCode()) {</span>
+            case KeyEvent.VK_LEFT:
+<span class="nc" id="L190">                this.sendMessage(this.moveLeftMessage);</span>
+<span class="nc" id="L191">                break;</span>
+            case KeyEvent.VK_RIGHT:
+<span class="nc" id="L193">                this.sendMessage(this.moveRightMessage);</span>
+<span class="nc" id="L194">                break;</span>
+            case KeyEvent.VK_UP:
+<span class="nc" id="L196">                this.sendMessage(this.moveUpMessage);</span>
+<span class="nc" id="L197">                break;</span>
+            case KeyEvent.VK_DOWN:
+<span class="nc" id="L199">                this.sendMessage(this.moveDownMessage);</span>
+<span class="nc" id="L200">                break;</span>
+            case KeyEvent.VK_SPACE:
+<span class="nc" id="L202">                this.sendMessage(this.setBombMessage);</span>
+<span class="nc" id="L203">                break;</span>
+            case KeyEvent.VK_X:
+<span class="nc" id="L205">                this.sendMessage(this.attackMessage);</span>
+<span class="nc" id="L206">                break;</span>
+            case KeyEvent.VK_Z:
+<span class="nc" id="L208">                this.sendMessage(this.bigAttackMessage);</span>
+<span class="nc" id="L209">                break;</span>
+            case KeyEvent.VK_C:
+<span class="nc" id="L211">                this.sendMessage(this.switchWeaponMessage);</span>
+<span class="nc" id="L212">                break;</span>
+            case KeyEvent.VK_W:
+<span class="nc" id="L214">                this.sendMessage(this.throwableWeaponMoveUpMessage);</span>
+<span class="nc" id="L215">                break;</span>
+            case KeyEvent.VK_S:
+<span class="nc" id="L217">                this.sendMessage(this.throwableWeaponMoveDownMessage);</span>
+<span class="nc" id="L218">                break;</span>
+            case KeyEvent.VK_A:
+<span class="nc" id="L220">                this.sendMessage(this.throwableWeaponMoveLeftMessage);</span>
+<span class="nc" id="L221">                break;</span>
+            case KeyEvent.VK_D:
+<span class="nc" id="L223">                this.sendMessage(this.throwableWeaponMoveRightMessage);</span>
+<span class="nc" id="L224">                break;</span>
+            case KeyEvent.VK_ESCAPE:
+<span class="nc" id="L226">                this.sendMessage(this.pauseWorldMessage);</span>
+                break;
+        }
+<span class="nc" id="L229">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @return {*}
+     * @description: 将玩家停止暂停的消息发给服务器
+     */
+    public void recoverWorld(){
+<span class="nc" id="L237">        this.sendMessage(this.recoverWorldMessage);</span>
+<span class="nc" id="L238">    }</span>
+
+    /**
+     * @author: Xu YangXin
+     * @param {Message} messageToServer 要发送给服务器的消息
+     * @return {Message} 服务器响应的消息
+     * @description: send方法的包装版本，处理抛出的异常
+     */    
+    public Message sendMessage(Message messageToServer){
+        try {
+<span class="nc" id="L248">            return this.send(messageToServer);</span>
+<span class="nc" id="L249">        } catch (UnknownHostException e) {</span>
+<span class="nc" id="L250">            e.printStackTrace();</span>
+<span class="nc" id="L251">        } catch (IOException e){</span>
+<span class="nc" id="L252">            e.printStackTrace();</span>
+<span class="nc" id="L253">        }</span>
+<span class="nc" id="L254">        return null;</span>
+    }
+
+    /**
+     * @author: Xu YangXin
+     * @param {Message} messageToServer 要发送给服务器的消息
+     * @return {Message} 服务器响应的消息
+     * @throws UnknownHostException 目标主机未知的异常
+     * @throws IOException 输入输出异常
+     * @description: 将目标消息发送到服务器
+     */
+    public Message send(Message messageToServer)
+    throws UnknownHostException, IOException{
+<span class="fc" id="L267">        Socket clientSocket = new Socket(&quot;localhost&quot;, 7070);</span>
+
+<span class="fc" id="L269">        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());</span>
+
+        //test
+<span class="fc" id="L272">        boolean flag = true;</span>
+<span class="fc bfc" id="L273" title="All 2 branches covered.">        while(flag){</span>
+            try {
+<span class="fc" id="L275">                outToServer.write(ByteArrayUtils.objectToBytes(messageToServer).get());</span>
+<span class="fc" id="L276">                flag = false;</span>
+<span class="nc" id="L277">            } catch (Exception e) {</span>
+<span class="nc" id="L278">                e.printStackTrace();</span>
+<span class="nc" id="L279">                continue;</span>
+<span class="fc" id="L280">            }</span>
+        }
+<span class="fc" id="L282">        outToServer.flush();</span>
+<span class="fc" id="L283">        clientSocket.shutdownOutput();</span>
+
+<span class="fc" id="L285">        InputStream inFromServer = clientSocket.getInputStream();</span>
+<span class="fc" id="L286">        byte[] dataFromServer = new byte[40960];</span>
+<span class="fc" id="L287">        inFromServer.read(dataFromServer);</span>
+
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if(messageToServer.info() == Message.GET_LATEST_ROOM_MESSAGE){</span>
+            try {
+<span class="fc" id="L291">                Thread.currentThread().sleep(300);</span>
+<span class="nc" id="L292">            } catch (InterruptedException e) {</span>
+<span class="nc" id="L293">                e.printStackTrace();</span>
+<span class="fc" id="L294">            }</span>
+        }
+
+<span class="fc" id="L297">        Message messageFromServer = Message.dataToObj(dataFromServer);</span>
+<span class="fc" id="L298">        System.out.println(&quot;Response from Server : &quot; + messageFromServer);</span>
+<span class="fc" id="L299">        clientSocket.close();</span>
+
+<span class="fc" id="L301">        return messageFromServer;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

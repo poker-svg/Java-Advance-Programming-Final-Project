@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NormalGun.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jfp-poker-svg</a> &gt; <a href="index.source.html" class="el_package">cn.edu.nju.cs.game.world.weapon.gun</a> &gt; <span class="el_source">NormalGun.java</span></div><h1>NormalGun.java</h1><pre class="source lang-java linenums">/*
+ *  ┌───┐   ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┐
+ *  │Esc│   │ F1│ F2│ F3│ F4│ │ F5│ F6│ F7│ F8│ │ F9│F10│F11│F12│ │P/S│S L│P/B│  ┌┐    ┌┐    ┌┐
+ *  └───┘   └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┘  └┘    └┘    └┘
+ *  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐ ┌───┬───┬───┐ ┌───┬───┬───┬───┐
+ *  │~ `│! 1│@ 2│# 3│$ 4│% 5│^ 6│&amp; 7│* 8│( 9│) 0│_ -│+ =│ BacSp │ │Ins│Hom│PUp│ │N L│ / │ * │ - │
+ *  ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤ ├───┼───┼───┤ ├───┼───┼───┼───┤
+ *  │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │{ [│} ]│ | \ │ │Del│End│PDn│ │ 7 │ 8 │ 9 │   │
+ *  ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴─────┤ └───┴───┴───┘ ├───┼───┼───┤ + │
+ *  │ Caps │ A │ S │ D │ F │ G │ H │ J │ K │ L │: ;│&quot; '│ Enter  │               │ 4 │ 5 │ 6 │   │
+ *  ├──────┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴────────┤     ┌───┐     ├───┼───┼───┼───┤
+ *  │ Shift  │ Z │ X │ C │ V │ B │ N │ M │&lt; ,│&gt; .│? /│  Shift   │     │ ↑ │     │ 1 │ 2 │ 3 │   │
+ *  ├─────┬──┴─┬─┴──┬┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬────┬────┤ ┌───┼───┼───┐ ├───┴───┼───┤ E││
+ *  │ Ctrl│    │Alt │         Space         │ Alt│    │    │Ctrl│ │ ← │ ↓ │ → │ │   0   │ . │←─┘│
+ *  └─────┴────┴────┴───────────────────────┴────┴────┴────┴────┘ └───┴───┴───┘ └───────┴───┴───┘
+ * 
+ * @Version: 1.0
+ * @Author: Xu YangXin
+ * @Date: 2022-11-27 17:53:41
+ * @LastEditTime: 2023-01-17 17:43:10
+ * @LastEditors: Xu YangXin
+ * @Description: 此类为普通枪械类
+ * @FilePath: \jfp-poker-svg\src\main\java\cn\edu\nju\cs\game\world\weapon\gun\NormalGun.java
+ * 此项目为南京大学《Java高级程序设计》项目
+ */
+
+package cn.edu.nju.cs.game.world.weapon.gun;
+
+import cn.edu.nju.cs.game.world.weapon.WeaponFactory;
+import cn.edu.nju.cs.game.world.creature.Creature;
+import cn.edu.nju.cs.game.world.item.Tile;
+public class NormalGun extends Gun{
+    public static final int RANGE = 5;
+    public static final String NAME = &quot;NormalGun&quot;;
+<span class="fc" id="L35">    public static final Tile IMAGE = Tile.NORMAL_GUN;</span>
+    public static final int ATTACK_VALUE = 10;
+    public static final int COLDING_INTERVAL = 800;
+    public static final int MAX_ENERGY = 3;
+    public static final int ADD_BULLET_INTERVAL = 1000;
+    public static final int MAX_BULLET_AMOUNT = 3;
+
+    /**
+     * @author: Xu YangXin
+     * @param {WeaponFactory} factory 生产此普通枪的武器工厂
+     * @param {Bullet} bulletSample 普通枪的子弹
+     * @return {*}
+     * @description: 构造器
+     */    
+    public NormalGun(WeaponFactory factory, Bullet bulletSample){
+<span class="fc" id="L50">        super(factory, NormalGun.NAME, NormalGun.IMAGE, NormalGun.ATTACK_VALUE,</span>
+                NormalGun.RANGE, NormalGun.COLDING_INTERVAL, NormalGun.MAX_ENERGY,
+                NormalGun.ADD_BULLET_INTERVAL, NormalGun.MAX_BULLET_AMOUNT, bulletSample);
+<span class="fc" id="L53">    }</span>
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 普通枪械的普攻是否成功
+     * @description: 普通枪普攻，向玩家面向的方向射出子弹
+     */    
+    public boolean attack(){
+<span class="pc bpc" id="L62" title="1 of 4 branches missed.">        if(!this.isActive() ||          // 枪处于冷却周期中</span>
+            this.remainingBullet &lt;= 0)  // 子弹不足
+<span class="fc" id="L64">            return false;               // 攻击失败</span>
+
+<span class="fc" id="L66">        Creature master = this.factory().master();</span>
+<span class="fc" id="L67">        int x = master.x(), y = master.y();</span>
+<span class="pc bpc" id="L68" title="1 of 5 branches missed.">        switch (master.direction()) {</span>
+            case Left:
+<span class="fc" id="L70">                x--;</span>
+<span class="fc" id="L71">                break;</span>
+            case Right:
+<span class="fc" id="L73">                x++;</span>
+<span class="fc" id="L74">                break;</span>
+            case Up:
+<span class="fc" id="L76">                y--;</span>
+<span class="fc" id="L77">                break;</span>
+            case Down:
+<span class="fc" id="L79">                y++;</span>
+<span class="fc" id="L80">                break;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L85">        master.world().addBullet(</span>
+<span class="fc" id="L86">            new Bullet(x, y, master.direction(), this.bulletSample)</span>
+        );
+<span class="fc" id="L88">        this.remainingBullet--;</span>
+
+<span class="fc" id="L90">        return true;</span>
+    }
+
+    @Override
+    /**
+     * @author: Xu YangXin
+     * @return {boolean} 普通枪的大招是否成功
+     * @description: 普通枪的大招，和普攻一致
+     */    
+    public boolean bigAttack(){
+<span class="pc bpc" id="L100" title="1 of 6 branches missed.">        if(!this.isActive() ||              // 枪处于冷却周期中</span>
+            this.remainingBullet &lt;= 0 ||    // 子弹不足
+            this.curEnergy &lt; this.maxEnergy)// 能量不足
+<span class="fc" id="L103">        return false;                       // 攻击失败</span>
+
+<span class="fc" id="L105">        Creature master = this.factory().master();</span>
+<span class="fc" id="L106">        int x = master.x(), y = master.y();</span>
+<span class="pc bpc" id="L107" title="4 of 5 branches missed.">        switch (master.direction()) {</span>
+            case Left:
+<span class="nc" id="L109">                x--;</span>
+<span class="nc" id="L110">                break;</span>
+            case Right:
+<span class="fc" id="L112">                x++;</span>
+<span class="fc" id="L113">                break;</span>
+            case Up:
+<span class="nc" id="L115">                y--;</span>
+<span class="nc" id="L116">                break;</span>
+            case Down:
+<span class="nc" id="L118">                y++;</span>
+<span class="nc" id="L119">                break;</span>
+            default:
+                break;
+        }
+
+<span class="fc" id="L124">        master.world().addBullet(</span>
+<span class="fc" id="L125">            new Bullet(x, y, master.direction(), this.bulletSample)</span>
+        );
+<span class="fc" id="L127">        this.remainingBullet--;</span>
+
+<span class="fc" id="L129">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
